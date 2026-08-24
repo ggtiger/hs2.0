@@ -1,0 +1,55 @@
+/**
+ * uni-app 全局变量文件
+ * 此文件会被 uni-app 自动注入到所有组件的 <style> 中（无需手动 import）
+ * 仅可放置变量声明，不要写实际样式规则
+ */
+
+/* 主题色 */
+$uni-color-primary: #2f7df6;
+$uni-color-success: #4caf50;
+$uni-color-warning: #ff9900;
+$uni-color-error: #f5222d;
+$uni-color-info: #909399;
+
+/* 文字颜色 */
+$uni-text-color: #333333;
+$uni-text-color-inverse: #ffffff;
+$uni-text-color-grey: #999999;
+$uni-text-color-placeholder: #cccccc;
+$uni-text-color-disable: #c0c0c0;
+
+/* 背景色 */
+$uni-bg-color: #ffffff;
+$uni-bg-color-grey: #f8f8f8;
+$uni-bg-color-hover: #f1f1f1;
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4);
+
+/* 边框 */
+$uni-border-color: #e5e5e5;
+
+/* 尺寸 */
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+$uni-font-size-title: 36rpx;
+
+$uni-spacing-row-sm: 10rpx;
+$uni-spacing-row-base: 20rpx;
+$uni-spacing-col-sm: 8rpx;
+$uni-spacing-col-base: 16rpx;
+
+$uni-border-radius-sm: 4rpx;
+$uni-border-radius-base: 6rpx;
+$uni-border-radius-lg: 12rpx;
+$uni-border-radius-circle: 50%;
+
+/* 透明度 */
+$uni-opacity-disabled: 0.3;
+
+/* 文章场景相关 */
+$uni-color-title: #2c405a;
+$uni-font-size-title: 40rpx;
+$uni-color-subtitle: #555555;
+$uni-font-size-subtitle: 36rpx;
+$uni-color-paragraph: #3f536e;
+$uni-font-size-paragraph: 30rpx;

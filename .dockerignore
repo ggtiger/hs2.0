@@ -1,0 +1,92 @@
+# 项目级 Docker 构建忽略文件
+# Dockerfile 在 deploy/ 下，构建上下文为项目根目录
+
+# 版本控制
+.git
+.gitignore
+.claude/
+
+# IDE
+.vscode/
+.idea/
+
+# 文档 & 临时文件
+*.md
+*.txt
+*.pptx
+docs/
+
+# ---- netcore (只保留 publish/ 和 runtime/) ----
+netcore/My.Test/
+netcore/Realso.Test/
+netcore/Realso.WebAPI/
+netcore/Realso.Auth/
+netcore/Realso.Core/
+netcore/Realso.Data.DBAccess/
+netcore/Realso.Data.ORM/
+netcore/Realso.Data.ORM.Core/
+netcore/Realso.Data.ORM2/
+netcore/Realso.Utils/
+netcore/databak/
+netcore/realso/
+netcore/Realso.sln
+netcore/Directory.Build.props
+netcore/appsettings.json
+netcore/daemon.json
+netcore/readme.md
+netcore/tempkey.rsa
+netcore/log4net.config
+netcore/deploy-local.sh
+netcore/deploy-on-server.sh
+netcore/build-local.sh
+netcore/build-and-export.sh
+netcore/download-dotnet-runtime.sh
+netcore/Dockerfile
+netcore/Dockerfile.local
+netcore/Dockerfile.base
+netcore/docker-compose*.yml
+netcore/.dockerignore
+netcore/.env
+netcore/start-app.sh
+netcore/realso-images.tar.gz
+
+# ---- p-admin (只保留 dist/) ----
+p-admin/node_modules/
+p-admin/docs/
+p-admin/src/
+p-admin/build/
+p-admin/config/
+p-admin/static/
+p-admin/sql/
+p-admin/backend/
+p-admin/package.json
+p-admin/package-lock.json
+p-admin/.babelrc
+p-admin/.editorconfig
+p-admin/.eslintrc*
+p-admin/.gitignore
+p-admin/.postcssrc
+p-admin/index.html
+p-admin/README.md
+p-admin/babel.config.js
+
+# ---- 其他 ----
+hs2-java/
+hs-mobile/
+onlyoffice-plugins/
+sql/
+src/
+
+# ---- 排除 deploy 中的脚本和文档（保留 Dockerfile、nginx.conf、start-app.sh）----
+deploy/build.sh
+deploy/export.sh
+deploy/deploy-on-server.sh
+deploy/deploy-plugins.sh
+deploy/docker-compose*.yml
+deploy/.env
+deploy/README.md
+deploy/realso-images.tar.gz
+
+# 日志和临时文件
+*.log
+.DS_Store

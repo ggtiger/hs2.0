@@ -1,0 +1,22 @@
+# =============================================================================
+# p-admin 前端 Dockerfile (nginx)
+# 
+# 前置步骤:
+#   在 p-admin/ 目录执行 npm install && npm run build
+#   产物位于 p-admin/dist/
+#
+# 使用:
+#   docker build -f deploy/Dockerfile.p-admin -t realso-admin .
+# =============================================================================
+
+FROM nginx:alpine
+
+# 复制构建产物
+COPY p-admin/dist/ /usr/share/nginx/html/
+
+# 复制 nginx 配置
+COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

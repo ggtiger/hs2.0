@@ -1,0 +1,83 @@
+/**
+ * 通用样式混入
+ */
+@import './variables.scss';
+
+/* 单行省略 */
+@mixin ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 多行省略 */
+@mixin ellipsis-multi($line: 2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: $line;
+  -webkit-box-orient: vertical;
+}
+
+/* flex 布局 */
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* 1px 边框（解决移动端细线问题） */
+@mixin hairline-top($color: $border-color) {
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 1px;
+    background-color: $color;
+    transform: scaleY(0.5);
+    transform-origin: 0 0;
+  }
+}
+
+@mixin hairline-bottom($color: $border-color) {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    background-color: $color;
+    transform: scaleY(0.5);
+    transform-origin: 0 100%;
+  }
+}
+
+/* 卡片 */
+@mixin card {
+  background-color: $bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+/* 安全区底部留白 */
+@mixin safe-bottom-padding($extra: 0rpx) {
+  padding-bottom: calc(#{$extra} + constant(safe-area-inset-bottom));
+  padding-bottom: calc(#{$extra} + env(safe-area-inset-bottom));
+}

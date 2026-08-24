@@ -1,0 +1,1 @@
+~/.dotnet-2.2/dotnet Realso.WebAPI/bin/Debug/netcoreapp2.2/Realso.WebAPI.dll --urls "https://localhost:5001;http://localhost:5000"

@@ -1,0 +1,37 @@
+{
+  "name": "hs-mobile",
+  "version": "1.0.0",
+  "description": "华溯计量管理系统 - 移动端 (uni-app + Vue3)",
+  "private": true,
+  "scripts": {
+    "dev:h5": "uni",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:h5": "uni build",
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "build:app": "uni build -p app",
+    "type-check": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@climblee/uv-ui": "^1.1.20",
+    "@dcloudio/uni-app": "3.0.0-alpha-1000920260615733",
+    "@dcloudio/uni-app-plus": "3.0.0-alpha-1000920260615733",
+    "@dcloudio/uni-components": "3.0.0-alpha-1000920260615733",
+    "@dcloudio/uni-h5": "3.0.0-alpha-1000920260615733",
+    "@dcloudio/uni-mp-weixin": "3.0.0-alpha-1000920260615733",
+    "dayjs": "^1.11.13",
+    "pinia": "^3.0.4",
+    "vue": "^3.4.21",
+    "vue-i18n": "^9.13.1"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "^3.4.31",
+    "@dcloudio/uni-cli-shared": "3.0.0-alpha-1000920260615733",
+    "@dcloudio/uni-stacktracey": "3.0.0-alpha-1000920260615733",
+    "@dcloudio/vite-plugin-uni": "3.0.0-alpha-1000920260615733",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "sass": "^1.77.0",
+    "tailwindcss": "^3.4.19",
+    "vite": "7.3.3"
+  }
+}

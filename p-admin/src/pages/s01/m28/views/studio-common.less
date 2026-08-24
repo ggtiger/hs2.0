@@ -1,0 +1,113 @@
+// Config Studio 设计系统
+// ========================
+
+// 颜色令牌
+@st-primary: #2F54EB;
+@st-primary-hover: #1d44c7;
+@st-primary-light: #e6f7ff;
+@st-primary-pale: #f0f5ff;
+@st-bg: #f5f6f8;
+@st-bg-white: #fff;
+@st-bg-gray: #fafbfc;
+@st-border: #e8e8e8;
+@st-border-light: #f0f0f0;
+@st-text: #1f1f1f;
+@st-text-sec: #666;
+@st-text-hint: #999;
+@st-text-disabled: #ccc;
+@st-success: #52c41a;
+@st-success-bg: #f6ffed;
+@st-error: #f5222d;
+@st-error-bg: #fff1f0;
+@st-purple: #722ed1;
+@st-purple-bg: #f9f0ff;
+@st-cyan: #13c2c2;
+@st-cyan-bg: #e6fffb;
+@st-warning: #fa8c16;
+@st-warning-bg: #fff7e6;
+@st-blue: #1890ff;
+
+// 尺寸
+@st-radius: 4px;
+@st-radius-pill: 12px;
+@st-mono: 'SF Mono', Menlo, Consolas, monospace;
+@st-space-sm: 8px;
+@st-space-md: 12px;
+@st-space-lg: 16px;
+@st-input-h: 32px;
+@st-label-w: 90px;
+@st-nav-w: 100px;
+@st-header-h: 48px;
+@st-obar-h: 44px;
+@st-list-h: 200px;
+
+// 通用按钮（替代旧 ed-btn / dc-detail-btn）
+.st-btn() {
+  height: @st-input-h;
+  padding: 0 @st-space-md;
+  border: 1px solid @st-border;
+  background: @st-bg-white;
+  border-radius: @st-radius;
+  cursor: pointer;
+  font-size: 12px;
+  color: @st-text-sec;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  &:hover { color: @st-primary; border-color: @st-primary; }
+  &:disabled { color: @st-text-disabled; cursor: not-allowed; }
+  &.primary {
+    background: @st-primary;
+    color: #fff;
+    border-color: @st-primary;
+    &:hover { background: @st-primary-hover; }
+    &:disabled { background: #a0b4ec; border-color: #a0b4ec; }
+  }
+}
+
+// 通用输入框
+.st-input() {
+  height: @st-input-h;
+  padding: 0 @st-space-sm;
+  border: 1px solid @st-border;
+  border-radius: @st-radius;
+  font-size: 12px;
+  outline: none;
+  background: @st-bg-white;
+  &:focus { border-color: @st-primary; }
+  &:disabled { background: @st-bg-gray; color: @st-text-hint; cursor: not-allowed; }
+  &.mono { font-family: @st-mono; }
+}
+
+// 类型徽章
+.st-type-badge(@bg; @color) {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: @bg;
+  color: @color;
+}
+
+// 状态消息
+.st-status() {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  &.success { background: @st-success-bg; color: @st-success; }
+  &.error { background: @st-error-bg; color: @st-error; }
+}
+
+// 空状态占位
+.st-empty() {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 100%;
+  color: @st-text-hint;
+  i { font-size: 40px; color: #d6e4ff; }
+  p { margin: 0; font-size: 13px; }
+}

@@ -1,0 +1,230 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^(state-tag|stat-card|search-bar|empty-state|todo-card|approve-bar|approver-picker|record-template|tpl-node)$": "@/components/$1.vue",
+      "^uv-(.*)$": "@climblee/uv-ui/components/uv-$1/uv-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "工作台",
+        "enablePullDownRefresh": true,
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/todo/list",
+      "style": {
+        "navigationBarTitleText": "待办中心",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/scan/index",
+      "style": {
+        "navigationBarTitleText": "扫一扫"
+      }
+    },
+    {
+      "path": "pages/query/index",
+      "style": {
+        "navigationBarTitleText": "业务查询"
+      }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": {
+        "navigationBarTitleText": "我的",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/approve/list",
+      "style": {
+        "navigationBarTitleText": "审批列表",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/approve/detail",
+      "style": {
+        "navigationBarTitleText": "审批详情"
+      }
+    },
+    {
+      "path": "pages/approve/batch",
+      "style": {
+        "navigationBarTitleText": "批量审批"
+      }
+    },
+    {
+      "path": "pages/query/delegate",
+      "style": {
+        "navigationBarTitleText": "委托单查询",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/query/record",
+      "style": {
+        "navigationBarTitleText": "原始记录查询",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/query/cert",
+      "style": {
+        "navigationBarTitleText": "证书查询",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/query/accept",
+      "style": {
+        "navigationBarTitleText": "受理单查询",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/query/fee",
+      "style": {
+        "navigationBarTitleText": "费用查询",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/query/logistics",
+      "style": {
+        "navigationBarTitleText": "物流查询"
+      }
+    },
+    {
+      "path": "pages/mine/cert",
+      "style": {
+        "navigationBarTitleText": "我的资质"
+      }
+    },
+    {
+      "path": "pages/mine/auth",
+      "style": {
+        "navigationBarTitleText": "我的授权"
+      }
+    },
+    {
+      "path": "pages/notice/list",
+      "style": {
+        "navigationBarTitleText": "系统公告",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/notice/detail",
+      "style": {
+        "navigationBarTitleText": "公告详情"
+      }
+    },
+    {
+      "path": "pages/out/progress",
+      "style": {
+        "navigationBarTitleText": "检测进度查询"
+      }
+    },
+    {
+      "path": "pages/out/verify",
+      "style": {
+        "navigationBarTitleText": "证书验证"
+      }
+    },
+    {
+      "path": "pages/out/logistics",
+      "style": {
+        "navigationBarTitleText": "物流查询"
+      }
+    },
+    {
+      "path": "pages/logistics/search",
+      "style": {
+        "navigationBarTitleText": "查找受理单"
+      }
+    },
+    {
+      "path": "pages/logistics/add",
+      "style": {
+        "navigationBarTitleText": "新增物流信息"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "华溯计量",
+    "navigationBarBackgroundColor": "#2f7df6",
+    "backgroundColor": "#F8F8F8",
+    "backgroundColorTop": "#2f7df6",
+    "backgroundColorBottom": "#F8F8F8"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#2f7df6",
+    "borderStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "工作台",
+        "iconPath": "static/icons/home.png",
+        "selectedIconPath": "static/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/todo/list",
+        "text": "待办",
+        "iconPath": "static/icons/todo.png",
+        "selectedIconPath": "static/icons/todo-active.png"
+      },
+      {
+        "pagePath": "pages/scan/index",
+        "text": "扫码",
+        "iconPath": "static/icons/scan.png",
+        "selectedIconPath": "static/icons/scan-active.png"
+      },
+      {
+        "pagePath": "pages/query/index",
+        "text": "查询",
+        "iconPath": "static/icons/query.png",
+        "selectedIconPath": "static/icons/query-active.png"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的",
+        "iconPath": "static/icons/mine.png",
+        "selectedIconPath": "static/icons/mine-active.png"
+      }
+    ]
+  },
+  "condition": {
+    "current": 0,
+    "list": [
+      {
+        "name": "工作台",
+        "path": "pages/index/index"
+      },
+      {
+        "name": "待办",
+        "path": "pages/todo/list"
+      },
+      {
+        "name": "证书验证(外部)",
+        "path": "pages/out/verify"
+      }
+    ]
+  }
+}

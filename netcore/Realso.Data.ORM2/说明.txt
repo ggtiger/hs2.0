@@ -1,0 +1,25 @@
+//数据模型管理
+Schema
+//数据描述
+DataSet
+DataView
+DataViewFields
+DataFieldValue
+DataRelation
+DataTable
+DataTableFields
+//数据操作
+//查询接口
+IQuery
+//数据操作接口
+IOperate
+
+//数据缓存
+数据视图缓存机制
+缓存更新点。
+订阅缓存更新点
+发布缓存更新点
+//表定义
+  表列定义
+//数据视图定义
+  视图表关系、表过滤器组成  

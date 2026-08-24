@@ -1,0 +1,892 @@
+// ============================================================================
+// 华溯计量管理系统 — 现代化CRM主题 v4
+// 设计方向：现代简洁、数据驱动、呼吸感布局
+// 参考：现代CRM后台管理系统设计规范
+// 核心原则：深色侧边栏 + 纯白头部 + 浅灰内容区 + 蓝色强调 + 卡片化布局
+// ============================================================================
+
+// ===== 主色系 =====
+// 品蓝 — 企业级标准蓝，专业可信
+@primary-color: #2F54EB;
+@primary-color-light: #597EF7;
+@primary-color-dark: #1D39C4;
+@primary-color-bg: #F0F5FF;
+@primary-color-border: #ADC6FF;
+
+// 功能色
+@link-color: @primary-color;
+@red-color: #F5222D;
+@green-color: #52C41A;
+@yellow-color: #FAAD14;
+@blue-color: #2F54EB;
+@orange-color: #FA8C16;
+@purple-color: #722ED1;
+
+// ===== 文字色系（5级灰阶，保证可读性） =====
+@dark-color: #1F1F1F;
+@dark1-color: #262626;
+@dark2-color: #434343;
+@dark3-color: #8C8C8C;
+@dark4-color: #BFBFBF;
+
+// ===== 边框/背景色系 =====
+@gray-color: #D9D9D9;
+@gray1-color: #E8E8E8;
+@gray2-color: #F0F0F0;
+@gray3-color: #F5F5F5;
+@gray4-color: #FAFAFA;
+
+// ===== 圆角（现代化圆角） =====
+@border-radius: 6px;
+@border-radius-base: 8px;
+@border-radius-small: 4px;
+@btn-border-radius: 6px;
+@card-border-radius: 2px;
+@border-radius-large: 16px;
+
+// ===== 阴影（更柔和的多层阴影） =====
+@shadow-card: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.04);
+@shadow-hover: 0 4px 16px rgba(0,0,0,0.10);
+@shadow-modal: 0 8px 24px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.06);
+@shadow-card-hover: 0 6px 20px rgba(0,0,0,0.08);
+
+// ===== 字体 =====
+@font-size-base: 14px;
+@font-size-small: 12px;
+@font-size-large: 16px;
+@font-size-title: 16px;
+@font-size-h1: 28px;
+@font-size-h2: 24px;
+@font-size-h3: 20px;
+
+// ===== 间距 =====
+@padding-base: 8px;
+@padding-large: 10px;
+@padding-small: 6px;
+@gap-base: 8px;
+@gap-large: 12px;
+
+// ===== 表格 =====
+@table-border-color: #F0F0F0;
+@table-header-bg: #FAFAFA;
+@table-row-hover-bg: #F0F5FF;
+@table-row-height: 52px;
+
+// ===== 卡片 =====
+@card-bg: #ffffff;
+@card-padding: 20px 24px;
+
+// ===== 布局 =====
+@menu-dark-color: #2F54EB;
+@layout-header-height: 56px;
+@layout-tab-height: 40px;
+@content-padding: 20px 24px;
+
+// ============================================================================
+// 组件级样式覆盖
+// ============================================================================
+
+// ===== 全局 =====
+body {
+  color: @dark2-color;
+  background: #F0F2F5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+}
+
+// ===== 过渡动画 =====
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// ===== 侧边栏菜单 =====
+.h-menu-dark {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+
+  .h-menu-show {
+    font-size: 14px;
+    padding: 0 16px;
+    height: 40px;
+    line-height: 40px;
+    transition: all 0.3s;
+    position: relative;
+    border-radius: 6px;
+    margin: 2px 8px;
+    &:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+  // 选中项：白色背景 + 蓝色文字
+  .h-menu-li-selected > .h-menu-show {
+    background: rgba(255, 255, 255, 0.95);
+    color: @primary-color;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    &::before {
+      display: none;
+    }
+  }
+  .h-menu-ul {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    .h-menu-show {
+      height: 36px;
+      line-height: 36px;
+      font-size: 14px;
+      padding-left: 44px;
+      margin: 2px 8px;
+    }
+  }
+  // 子菜单展开动画
+  .h-menu-ul-show {
+    transition: max-height 0.3s ease-in-out;
+  }
+  // 分组标题
+  .h-menu-group-title {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.45);
+    padding: 16px 16px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// 侧边栏收起状态：图标居中 + 子菜单弹出样式
+.h-menu-size-collapse {
+  > .h-menu-li > .h-menu-show {
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px 8px;
+    .h-menu-show-icon {
+      margin-right: 0;
+    }
+  }
+  // 子菜单弹出样式（不覆盖定位和动画，只设置外观）
+  .h-menu-ul {
+    background: #fff !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-radius: 6px !important;
+    .h-menu-show {
+      color: @dark2-color !important;
+      padding: 0 16px !important;
+      margin: 0 !important;
+      height: 36px;
+      line-height: 36px;
+      border-radius: 0;
+      &:hover {
+        color: @primary-color !important;
+        background: @primary-color-bg !important;
+      }
+    }
+    .h-menu-show.h-menu-li-selected {
+      color: @primary-color !important;
+      background: @primary-color-bg !important;
+      font-weight: 600;
+    }
+  }
+}
+
+// ===== 头部 =====
+.h-layout-header {
+  height: @layout-header-height;
+  line-height: @layout-header-height;
+  z-index: 10;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  &-theme-dark {
+    color: rgba(255, 255, 255, 0.85);
+    background: #001529;
+  }
+  &-theme-white {
+    background: #FFF;
+    border-bottom: none;
+  }
+}
+
+// ===== 面板 =====
+.h-panel {
+  border-radius: @card-border-radius;
+  box-shadow: @shadow-card;
+  border: none;
+  background: @card-bg;
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: @shadow-card-hover;
+  }
+
+  &.h-panel-no-border {
+    border: none;
+    box-shadow: @shadow-card;
+    &:hover {
+      box-shadow: @shadow-card-hover;
+    }
+  }
+
+  .h-panel-bar {
+    border-radius: @card-border-radius @card-border-radius 0 0;
+    background: #fff;
+    border-bottom: 1px solid @gray2-color;
+    padding: @padding-small 10px;
+
+    .h-panel-title {
+      font-size: @font-size-title;
+      color: @dark-color;
+      font-weight: 600;
+    }
+  }
+
+  .h-panel-body {
+    padding: @padding-base @padding-large;
+  }
+}
+
+// ===== 表格 =====
+.h-table {
+  font-size: @font-size-base;
+  border-radius: @border-radius-base;
+  overflow: hidden;
+
+  .h-table-header {
+    background: @table-header-bg;
+    border-bottom: none;
+    flex-shrink: 0;
+    th {
+      font-weight: 600;
+      color: @dark1-color;
+      font-size: 14px;
+    }
+  }
+
+  .h-table-row {
+    transition: background 0.2s;
+    td {
+      padding: 10px 16px;
+      font-size: @font-size-base;
+      height: 40px;
+      border-top: 1px solid #F0F0F0;
+    }
+  }
+
+  .h-table-row:hover {
+    background: @table-row-hover-bg !important;
+  }
+
+  .h-table-row.h-table-tr-selected {
+    background: #E6F4FF !important;
+  }
+
+  .h-table-container {
+    border-color: @table-border-color;
+    border-radius: @border-radius-base;
+  }
+
+  td {
+    color: @dark2-color;
+  }
+}
+
+// ===== 分页 =====
+.h-page {
+  .h-page-item {
+    border-radius: @border-radius;
+    border-color: @gray1-color;
+    color: @dark3-color;
+    min-width: 32px;
+    height: 32px;
+    line-height: 32px;
+    &:hover {
+      color: @primary-color;
+      border-color: @primary-color;
+    }
+    &.h-page-item-active {
+      background: @primary-color;
+      border-color: @primary-color;
+      color: #fff;
+    }
+  }
+}
+
+// ===== 按钮 =====
+.h-btn {
+  border-radius: @btn-border-radius;
+  font-size: 14px;
+  box-shadow: none;
+  border: 1px solid @gray-color;
+  transition: all 0.2s ease;
+
+  &-primary {
+    background: @primary-color;
+    border-color: @primary-color;
+    color: #fff;
+    &:hover, &:focus {
+      background: @primary-color-light;
+      border-color: @primary-color-light;
+    }
+    &:active {
+      background: @primary-color-dark;
+      border-color: @primary-color-dark;
+    }
+  }
+
+  &-red {
+    background: @red-color;
+    border-color: @red-color;
+    color: #fff;
+    &:hover {
+      background: #FF4D4F;
+      border-color: #FF4D4F;
+    }
+    &:active {
+      background: #CF1322;
+      border-color: #CF1322;
+    }
+  }
+
+  &-green {
+    background: @green-color;
+    border-color: @green-color;
+    color: #fff;
+    &:hover {
+      background: #73D13D;
+      border-color: #73D13D;
+    }
+  }
+
+  &-blue {
+    background: @primary-color;
+    border-color: @primary-color;
+    color: #fff;
+    &:hover {
+      background: @primary-color-light;
+      border-color: @primary-color-light;
+    }
+  }
+
+  &:hover {
+    border-color: @primary-color;
+  }
+
+  rr-font {
+    color: #FFF;
+  }
+}
+
+.h-btn.h-btn-s {
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+// ===== 表单 =====
+.h-form {
+  .h-form-label {
+    font-size: @font-size-base;
+    color: @dark1-color;
+  }
+  // twocolumn: 容器用 flex-wrap，FormItem 不用 float，避免 label 换行错位
+  &.h-form-twocolumn {
+    display: flex;
+    flex-wrap: wrap;
+    // rs-flex-col 会设 flex-direction: column，twocolumn 需要 row 方向换行
+    flex-direction: row;
+    // rs-flex-col 的 overflow: hidden 会截断内容，改为 auto 允许滚动
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    // 非两列的块级子元素占满一行
+    > .h-row,
+    > .h-table,
+    > div:not(.h-form-item),
+    > .rr-table-header,
+    > .rr-flex-1 {
+      width: 100%;
+    }
+    // Row 内部也用 flex 让 FormItem 两列排列
+    > .h-row {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .h-form-item {
+      width: 50%;
+      float: none;
+      display: flex;
+      align-items: flex-start;
+      padding-bottom: 18px;
+      &-label {
+        width: 100px;
+        min-width: 100px;
+        float: none;
+        flex-shrink: 0;
+        text-align: right;
+        font-size: 14px;
+      }
+      &-content {
+        margin-left: 0 !important;
+        flex: 1;
+        min-width: 0;
+      }
+      &.h-form-item-single {
+        width: 100%;
+      }
+    }
+    // 最后一个 Row 内的表单项间距更紧凑
+    > .h-row:last-child > .h-form-item {
+      padding-bottom: 13px;
+    }
+  }
+}
+
+// ===== 输入框 =====
+input.h-input,
+.h-select .h-select-show,
+.h-textarea,
+.h-datetime .h-datetime-show,
+.h-numberinput .h-numberinput-input {
+  border-radius: @border-radius;
+  border-color: @gray-color;
+  color: @dark-color;
+  font-size: @font-size-base;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: @primary-color-light;
+  }
+  &:focus {
+    border-color: @primary-color;
+    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12);
+  }
+}
+
+// 所有输入框统一 14px
+input[type="text"],
+input[type="password"],
+input[type="number"],
+textarea,
+select,
+.h-autocomplete .h-autocomplete-input {
+  font-size: @font-size-base;
+}
+
+input.h-input::placeholder,
+.h-textarea::placeholder {
+  color: @dark4-color;
+  font-size: 13px;
+}
+
+// ===== 弹窗 =====
+.h-modal .h-notify-container {
+  border-radius: @card-border-radius;
+  box-shadow: @shadow-modal;
+
+  .h-modal-header,
+  header:first-child {
+    border-radius: @card-border-radius @card-border-radius 0 0;
+    border-bottom: 1px solid @gray2-color;
+    background: #fff;
+    font-size: @font-size-large;
+    color: @dark-color;
+    font-weight: 600;
+    padding: 14px 20px;
+    min-height: 48px;
+    line-height: 48px;
+  }
+
+  .h-modal-footer,
+  footer:last-child {
+    border-top: 1px solid @gray2-color;
+    padding: 5px 10px;
+    background: #fff;
+  }
+}
+
+// ===== 确认弹窗 =====
+.h-modal-comfirm .h-notify-container {
+  .h-modal-header,
+  header:first-child {
+    padding: 10px 20px;
+    min-height: 20px;
+    line-height: 20px;
+    border-bottom: 1px solid #e8e8e8;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+  .h-notify-content {
+    padding: 25px 20px;
+  }
+  .h-modal-footer,
+  footer:last-child {
+    padding: 5px 10px;
+    border-top: 1px solid #e8e8e8;
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// ===== 抽屉 =====
+.h-drawer .h-drawer-header {
+  background: #fff;
+  border-bottom: 1px solid @gray2-color;
+  font-weight: 600;
+  color: @dark-color;
+}
+
+// ===== 标签页 =====
+.h-tabs {
+  .h-tabs-default > .h-tabs-item {
+    color: @dark3-color;
+    font-size: @font-size-base;
+    &:hover {
+      color: @primary-color-light;
+    }
+    &.h-tabs-item-selected {
+      color: @primary-color;
+      border-bottom-color: @primary-color;
+    }
+  }
+
+  .h-tabs-card > .h-tabs-item {
+    color: @dark3-color;
+    font-size: 14px;
+    &:hover {
+      color: @primary-color-light;
+    }
+    &.h-tabs-item-selected {
+      color: @primary-color;
+      border-top-color: @primary-color;
+    }
+  }
+}
+
+// ===== 面包屑 =====
+.h-breadcrumb {
+  font-size: 14px;
+  color: @dark3-color;
+  a {
+    color: @primary-color;
+  }
+}
+
+// ===== 搜索框 =====
+.h-search .h-search-input {
+  border-radius: @border-radius-base;
+  border-color: @gray-color;
+  &:focus {
+    border-color: @primary-color;
+    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.12);
+  }
+}
+
+// ===== 标签 =====
+.h-tag {
+  border-radius: @border-radius-small;
+  font-size: 12px;
+}
+
+// ===== 开关 =====
+.h-switch {
+  line-height: 30px;
+}
+
+// ===== 进度条 =====
+.h-progress-inner {
+  background: @primary-color;
+}
+
+// ===== 步骤条 =====
+.h-steps .h-steps-item.h-steps-item-active .h-steps-item-head {
+  color: @primary-color;
+  border-color: @primary-color;
+}
+
+// ===== 消息提示/通知 =====
+.h-notice-container {
+  z-index: 2000;
+}
+
+.h-notify-container {
+  border-radius: @card-border-radius;
+  box-shadow: @shadow-modal;
+}
+
+// ===== 滚动条 =====
+.rr-scroll-bar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.rr-scroll-bar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+.rr-scroll-bar::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+  &:hover {
+    background: rgba(0, 0, 0, 0.25);
+  }
+}
+
+.h-table-container .h-table-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.h-table-container .h-table-body::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+.h-table-container .h-table-body::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.15);
+  &:hover {
+    background: rgba(0, 0, 0, 0.25);
+  }
+}
+
+// ===== 固定列滚动同步 =====
+// CSS 锁死 margin-top（阻止 Vue 异步更新），JS 用 transform 做偏移
+// 去掉弹性滚动效果
+.h-table-body {
+  overscroll-behavior: none;
+}
+
+.h-table-fixed-left-table,
+.h-table-fixed-right-table {
+  margin-top: 0 !important;
+}
+
+// ===== 固定列样式统一 =====
+.h-table-fixed-header-left {
+  box-shadow: none;
+  border-right: none;
+  border-bottom: none;
+}
+.h-table-fixed-header-right {
+  box-shadow: none;
+  border-left: none;
+  border-bottom: none;
+}
+
+.h-table-border th {
+  border-bottom: 1px solid @gray2-color;
+}
+
+.h-table-border .h-table-header table {
+  margin-bottom: 0;
+}
+.h-table-border .h-table-fixed-header-left table,
+.h-table-border .h-table-fixed-header-right table {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.h-table-container {
+  border-top: none;
+}
+
+.h-table-fixed-left {
+  box-shadow: none;
+  border-right: none;
+}
+.h-table-fixed-right {
+  box-shadow: none;
+  border-left: none;
+}
+
+// ===== 列表页底部操作栏 =====
+.rr-table-toolBar .rr-right {
+  right: 10px;
+}
+
+// ===== 标签对齐 =====
+.rr-justify {
+  color: @dark2-color;
+  font-size: @font-size-base;
+}
+
+// ===== 左侧列表区 =====
+.left-list {
+  background: #fff;
+  border: 1px solid @gray2-color;
+  border-radius: @card-border-radius;
+  padding: 12px;
+  margin: 10px;
+  height: calc(100% - 20px);
+}
+
+// ===== 编辑区 =====
+.edit {
+  background: #fff;
+  border: 1px solid @gray2-color;
+  border-radius: @card-border-radius;
+  padding: 20px 40px;
+  min-height: 100%;
+  width: 900px;
+  margin: 0 auto;
+}
+
+// ===== 审批记录时间轴 =====
+.rr-timeline {
+  padding: 10px 0;
+  &-item {
+    display: flex;
+    padding-bottom: 20px;
+    position: relative;
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+  &-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 6px 12px 0 0;
+    flex-shrink: 0;
+    &.dot-blue { background: @primary-color; }
+    &.dot-green { background: @green-color; }
+    &.dot-red { background: @red-color; }
+    &.dot-primary { background: @primary-color-light; }
+    &.dot-gray { background: @dark4-color; }
+  }
+  &-content { flex: 1; }
+  &-header { display: flex; justify-content: space-between; }
+  &-user { font-weight: 600; color: @dark-color; font-size: 14px; }
+  &-state { color: @primary-color; font-size: 13px; font-weight: 500; }
+  &-time { color: @dark3-color; font-size: 13px; margin-top: 4px; }
+  &-remark {
+    color: @dark2-color;
+    margin-top: 6px;
+    font-size: 13px;
+    background: @gray3-color;
+    padding: 8px 12px;
+    border-radius: @border-radius;
+    border-left: 3px solid @primary-color;
+  }
+}
+
+// ============================================================================
+// 仪表盘专用样式
+// ============================================================================
+
+// ===== 统计卡片 =====
+.stat-card {
+  background: #fff;
+  border-radius: @card-border-radius;
+  padding: 20px 24px;
+  box-shadow: @shadow-card;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: @shadow-card-hover;
+    transform: translateY(-2px);
+  }
+
+  &-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 16px;
+    &.blue { background: linear-gradient(135deg, @primary-color, @primary-color-light); }
+    &.green { background: linear-gradient(135deg, @green-color, #73D13D); }
+    &.orange { background: linear-gradient(135deg, @orange-color, #FFC53D); }
+    &.purple { background: linear-gradient(135deg, @purple-color, #B37FEB); }
+  }
+
+  &-value {
+    font-size: @font-size-h1;
+    font-weight: 700;
+    color: @dark-color;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  &-label {
+    font-size: @font-size-small;
+    color: @dark3-color;
+    margin-bottom: 12px;
+  }
+
+  &-footer {
+    display: flex;
+    align-items: center;
+    font-size: @font-size-small;
+    color: @dark3-color;
+    border-top: 1px solid @gray2-color;
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+
+  &-trend {
+    font-weight: 500;
+    margin-left: 4px;
+    &.up { color: @green-color; }
+    &.down { color: @red-color; }
+  }
+}
+
+// ===== Dashboard 布局 =====
+.dashboard-row {
+  display: flex;
+  gap: @gap-base;
+  margin-bottom: @gap-base;
+  flex-wrap: wrap;
+}
+
+.dashboard-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-card {
+  background: #fff;
+  border-radius: @card-border-radius;
+  box-shadow: @shadow-card;
+  transition: box-shadow 0.3s;
+  &:hover {
+    box-shadow: @shadow-card-hover;
+  }
+  &-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid @gray2-color;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  &-title {
+    font-size: @font-size-title;
+    font-weight: 600;
+    color: @dark-color;
+  }
+  &-body {
+    padding: 16px 20px;
+  }
+  &-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+// ===== Row/Cell 等高布局（仅限 dashboard 页面） =====
+// 注意：不能全局设置，否则会影响表单、表格等所有使用 Row/Cell 的地方
+.dashboard {
+  > .h-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  > .h-row > .h-col {
+    display: flex;
+    flex-direction: column;
+    > * {
+      flex: 1;
+    }
+  }
+}

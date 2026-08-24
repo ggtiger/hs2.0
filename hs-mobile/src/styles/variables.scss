@@ -1,0 +1,69 @@
+/**
+ * 项目主题变量（业务层使用）
+ * 与 uni.scss 的区别：uni.scss 是 uni-ui 组件库约定的变量，这里扩展业务变量
+ */
+
+/* 品牌主色 —— 与桌面端 p-admin 保持一致 */
+$brand-primary: #2f7df6;
+$brand-primary-dark: #1a66d9;
+$brand-primary-light: #e8f1fe;
+
+/* 功能色 */
+$color-success: #07c160;
+$color-warning: #ff9900;
+$color-danger: #f5222d;
+$color-info: #909399;
+
+/* 单据状态色（对应 STATE 码） */
+$state-pending: #909399;     /* 1 待提交 */
+$state-checking: #ff9900;    /* 2 待审核 */
+$state-checked: #2f7df6;     /* 3/5 已审核/待审批 */
+$state-approved: #07c160;    /* 6/20 已审批 */
+$state-signed: #1a66d9;      /* 10 已签发 */
+$state-rejected: #f5222d;    /* 12 已驳回 */
+
+/* 文字层级 */
+$text-1: #1a1a1a;   /* 主标题 */
+$text-2: #333333;   /* 常规正文 */
+$text-3: #666666;   /* 次要文字 */
+$text-4: #999999;   /* 辅助文字 */
+$text-5: #cccccc;   /* 占位/禁用 */
+
+/* 背景层级 */
+$bg-page: #f5f7fa;     /* 页面背景 */
+$bg-card: #ffffff;     /* 卡片背景 */
+$bg-hover: #f2f3f5;    /* 点击态 */
+$bg-mask: rgba(0, 0, 0, 0.45);  /* 遮罩 */
+
+/* 边框/分割线 */
+$border-color: #ebeef5;
+$divider-color: #f0f0f0;
+
+/* 圆角 */
+$radius-sm: 8rpx;
+$radius-md: 12rpx;
+$radius-lg: 16rpx;
+$radius-xl: 24rpx;
+$radius-circle: 50%;
+
+/* 阴影 */
+$shadow-card: 0 2rpx 12rpx 0 rgba(0, 0, 0, 0.05);
+$shadow-tab: 0 -2rpx 12rpx 0 rgba(0, 0, 0, 0.06);
+
+/* 间距（rpx） */
+$space-xs: 8rpx;
+$space-sm: 16rpx;
+$space-md: 24rpx;
+$space-lg: 32rpx;
+$space-xl: 48rpx;
+
+/* 字号（rpx） */
+$font-xs: 20rpx;
+$font-sm: 24rpx;
+$font-md: 28rpx;
+$font-lg: 32rpx;
+$font-xl: 36rpx;
+$font-xxl: 44rpx;
+
+/* 安全区 */
+$safe-bottom: env(safe-area-inset-bottom);

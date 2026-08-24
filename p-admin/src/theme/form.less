@@ -1,0 +1,45 @@
+@import '~heyui/themes/components/auto-complete.less';
+
+  @{autocompleteCls} {
+  .@{autocompleteCls} {
+    &-show{
+      min-height: @input-height;
+      display: flex;
+      flex-wrap: wrap;
+      .h-func-border-input();
+      padding-right: 20px;
+      // display: inline-block;
+      .@{prefix}icon-loading{
+        color: @dark4-color;
+      }
+      .@{prefix}icon-loading{
+        .h-func-input-right-icon();
+      }
+      &:hover >.@{prefix}icon-close{
+        display: inline-block
+      }
+      & >.@{prefix}icon-close{
+        .h-func-input-right-icon();
+        display: none;
+      }
+
+      >span{
+        .h-func-tag-span();
+      }
+    }
+
+    &-input{
+      .h-func-border-input-inside-input();
+    }
+  }
+
+  &-disabled{
+    .@{autocompleteCls}-show{
+      .h-func-border-input-disabled();
+    }
+  }
+  &-ul {
+    .h-func-list-style();
+  }
+
+}

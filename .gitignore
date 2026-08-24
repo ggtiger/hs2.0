@@ -1,0 +1,25 @@
+.DS_Store
+node_modules/
+dist/
+unpackage/
+
+# .NET 构建产物
+bin/
+obj/
+runtime/
+publish/
+
+# 上传与日志
+upload/
+Log/
+*.log
+
+# 编辑器
+.idea/
+.vscode/
+*.sw*
+
+# 环境变量（含密码等敏感信息）
+.env
+.env.local
+.env.*.local

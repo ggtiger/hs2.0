@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspose.Words" Version="19.12.0" />
+    <PackageReference Include="Dapper" Version="1.50.5" />
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="DinkToPdfCopy" Version="1.0.0" />
+    <PackageReference Include="DocumentFormat.openxml" Version="2.9.1" />
+    <PackageReference Include="EasyOffice" Version="1.1.3" />
+    <PackageReference Include="EasyOffice.Extensions" Version="1.0.2" />
+    <PackageReference Include="FreeSpire.Doc" Version="7.11.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="MySqlClient" Version="5.4.2" />
+    <PackageReference Include="System.Data.OracleClient" Version="1.0.8" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Realso.Data.ORM\Realso.Data.ORM.csproj" />
+    <ProjectReference Include="..\Realso.Utils\Realso.Utils.csproj" />
+    <ProjectReference Include="..\Realso.Data.DBAccess\Realso.Data.DBAccess.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,29 @@
+{
+  "name": "External HTML Paste",
+  "nameLocale": {
+    "zh-CN": "外部HTML粘贴",
+    "en-US": "External HTML Paste"
+  },
+  "guid": "asc.{5F3B1A7C-8D2E-4B6F-A1C3-9E7D5F2B8A4E}",
+  "variations": [
+    {
+      "description": "Paste HTML content from external page into OnlyOffice editor",
+      "descriptionLocale": {
+        "zh-CN": "从外部页面粘贴HTML内容到OnlyOffice编辑器",
+        "en-US": "Paste HTML content from external page into OnlyOffice editor"
+      },
+      "url": "index.html",
+      "icons": [],
+      "isViewer": true,
+      "EditorsSupport": ["cell"],
+      "isVisual": false,
+      "isModal": false,
+      "isInsideMode": false,
+      "isSystem": true,
+      "initDataType": "none",
+      "initData": "",
+      "buttons": [],
+      "events": []
+    }
+  ]
+}

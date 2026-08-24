@@ -1,0 +1,26 @@
+# =============================================================================
+# .NET Core 2.2 应用 Dockerfile
+# 基于已有基础镜像 (realso-base)，只需添加应用代码
+# 
+# 前置条件: realso-base:latest 基础镜像已存在
+#   可通过 netcore/Dockerfile.local 首次构建获得
+#
+# 使用:
+#   cd deploy && docker build --platform linux/amd64 -f Dockerfile.dotnet --build-arg APP=webapi -t realso-webapi .
+# =============================================================================
+
+FROM realso-base:latest
+
+# 复制启动脚本
+COPY deploy/start-app.sh /usr/local/bin/start-app.sh
+RUN chmod +x /usr/local/bin/start-app.sh
+
+# 复制应用代码
+ARG APP=webapi
+COPY netcore/publish/${APP}/ /app/
+
+EXPOSE 5001 5000
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+ENTRYPOINT ["/usr/local/bin/start-app.sh"]

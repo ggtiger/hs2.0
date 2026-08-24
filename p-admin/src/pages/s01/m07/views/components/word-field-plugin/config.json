@@ -1,0 +1,29 @@
+{
+  "name": "Word Template Field Insert",
+  "nameLocale": {
+    "zh-CN": "模版字段插入",
+    "en-US": "Template Field Insert"
+  },
+  "guid": "asc.{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}",
+  "variations": [
+    {
+      "description": "Insert Content Control fields into Word template",
+      "descriptionLocale": {
+        "zh-CN": "在Word模版中插入Content Control字段占位符",
+        "en-US": "Insert Content Control field placeholders into Word template"
+      },
+      "url": "index.html",
+      "icons": [],
+      "isViewer": true,
+      "EditorsSupport": ["word"],
+      "isVisual": false,
+      "isModal": false,
+      "isInsideMode": false,
+      "isSystem": true,
+      "initDataType": "none",
+      "initData": "",
+      "buttons": [],
+      "events": ["onContentControlAdd"]
+    }
+  ]
+}

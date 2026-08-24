@@ -1,0 +1,31 @@
+{
+  "name": "字段插入",
+  "nameLocale": {
+    "zh": "字段插入",
+    "en": "Field Inserter"
+  },
+  "guid": "asc.{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}",
+  "version": "1.2.0",
+  "variations": [
+    {
+      "description": "插入模版字段到文档",
+      "url": "index.html",
+      "isViewer": false,
+      "EditorsSupport": [
+        "word"
+      ],
+      "isVisual": false,
+      "isModal": false,
+      "isInsideMode": false,
+      "initDataType": "none",
+      "initOnSelectionChanged": false,
+      "events": [
+        "onToolbarMenuClick"
+      ],
+      "size": [
+        400,
+        600
+      ]
+    }
+  ]
+}

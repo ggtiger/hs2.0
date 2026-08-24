@@ -1,0 +1,52 @@
+# =============================================================================
+# 本地构建版 Dockerfile - 完全离线构建
+# 
+# 前置步骤:
+#   ./build-local.sh              # 构建应用 (publish/linux-x64)
+#   ./download-dotnet-runtime.sh  # 下载 .NET 运行时
+#
+# 使用:
+#   # 本地测试 (arm64, Apple Silicon Mac)
+#   docker build -f Dockerfile.local --build-arg APP=webapi -t realso-webapi .
+#   
+#   # 服务器部署 (amd64, x64 服务器)
+#   docker build --platform linux/amd64 -f Dockerfile.local --build-arg APP=webapi -t realso-webapi .
+# =============================================================================
+
+FROM debian:buster-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Debian Buster 已 EOL, 修复 apt 源到 archive
+RUN printf 'deb http://archive.debian.org/debian buster main\n' > /etc/apt/sources.list && \
+    printf 'deb http://archive.debian.org/debian-security buster/updates main\n' >> /etc/apt/sources.list
+
+# 安装 .NET Core 运行时所需系统库
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    libc6 libgcc1 libgssapi-krb5-2 libicu63 liblttng-ust0 \
+    libssl1.1 libstdc++6 libunwind8 libzstd1 zlib1g \
+    && rm -rf /var/lib/apt/lists/*
+
+# 使用本地预下载的 .NET Core 2.2 运行时
+COPY runtime/dotnet/ /usr/share/dotnet/
+RUN ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+
+WORKDIR /app
+RUN mkdir -p /app/upload /app/log
+
+# 复制启动脚本
+COPY start-app.sh /usr/local/bin/start-app.sh
+RUN chmod +x /usr/local/bin/start-app.sh
+
+# 复制本地 dotnet publish 产物
+ARG APP=webapi
+COPY publish/${APP}/ /app/
+
+EXPOSE 5001 5000
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# 使用启动脚本入口
+ENTRYPOINT ["/usr/local/bin/start-app.sh"]

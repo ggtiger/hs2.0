@@ -1,0 +1,90 @@
+# =============================================================================
+# Realso 统一 Docker Compose - 生产环境
+# 包含: MySQL + Auth + WebAPI + p-admin (nginx)
+# 
+# 使用:
+#   # 服务器上加载镜像后启动
+#   docker compose -f docker-compose.yml up -d
+# =============================================================================
+
+services:
+  # ---- MySQL Database -------------------------------------------------------
+  mysql:
+    image: mysql:8.0
+    container_name: realso-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-d0001}
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---- Auth Service ---------------------------------------------------------
+  auth:
+    image: realso-auth:latest
+    container_name: realso-auth
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://0.0.0.0:5000"
+      ConnectionStrings__D0001: "Server=mysql;Database=${MYSQL_DATABASE:-d0001};User=root;Password=${MYSQL_ROOT_PASSWORD:-rootpassword};Port=3306;Charset=utf8mb4"
+    expose:
+      - "5000"
+    volumes:
+      - upload_data:/app/upload
+      - log_data:/app/log
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # ---- WebAPI Service -------------------------------------------------------
+  webapi:
+    image: realso-webapi:latest
+    container_name: realso-webapi
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_PORT: "5001"
+      Auth__Authority: "http://auth:5000"
+      Upload__ROOT: "/app/upload/"
+      ConnectionStrings__D0001: "Server=mysql;Database=${MYSQL_DATABASE:-d0001};User=root;Password=${MYSQL_ROOT_PASSWORD:-rootpassword};Port=3306;Charset=utf8mb4"
+    expose:
+      - "5001"
+    volumes:
+      - upload_data:/app/upload
+      - log_data:/app/log
+    depends_on:
+      mysql:
+        condition: service_healthy
+      auth:
+        condition: service_started
+
+  # ---- p-admin 前端 (nginx) -------------------------------------------------
+  admin:
+    image: realso-admin:latest
+    container_name: realso-admin
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-8080}:80"
+    depends_on:
+      - webapi
+      - auth
+
+# ---- Volumes ---------------------------------------------------------------
+volumes:
+  mysql_data:
+  upload_data:
+  log_data:

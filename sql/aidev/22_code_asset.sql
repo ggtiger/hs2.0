@@ -1,0 +1,296 @@
+-- ============================================================
+-- 统一代码资产表 tss_code_asset — 数据库升级
+-- 内容: ① 建表(四类型 csharp/sql/js/vue 合一) ② 数据迁移(保留原 ID)
+--       ③ 新 TBS 资源注册 ④ 三个 VSS 视图重接(REFFIELDID 别名保 FIELDNAME,
+--         前端/DataTable/版本捕获零改动) ⑤ 过滤器加类型条件 ⑥ SS_MOD_CODEFILES 重写
+-- 原则: 老表(tss_api_script/tss_sql/tbs_sfc_template)保留作历史归档, 不删
+-- 日期: 2026-07-17
+-- ============================================================
+
+-- -----------------------------------------------------------
+-- 1. 建表: tss_code_asset
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS tss_code_asset (
+  ID          VARCHAR(36) NOT NULL COMMENT '主键(迁移保留原表 ID)',
+  ASSETTYPE   VARCHAR(16) NOT NULL COMMENT '资产类型: csharp/sql/js/vue',
+  CODE        VARCHAR(200) NOT NULL COMMENT '编码(SCRIPTCODE/SQLCODE/TEMPLATECODE)',
+  NAME        VARCHAR(200) DEFAULT NULL COMMENT '名称(SCRIPTNAME/TEMPLATENAME/REMARK)',
+  MODULEPATH  VARCHAR(200) DEFAULT NULL COMMENT 'SFC 路径(仅 js/vue)',
+  FILETYPE    VARCHAR(16) DEFAULT NULL COMMENT 'JS/VUE(仅 js/vue)',
+  SOURCECODE  LONGTEXT COMMENT '源码(SQLTXT/SOURCECODE)',
+  COMPILEDCODE LONGTEXT COMMENT 'SFC 编译产物(仅 js/vue)',
+  DEPS        VARCHAR(2000) DEFAULT NULL COMMENT 'SFC 依赖(仅 js/vue)',
+  SQLTYPE     VARCHAR(16) DEFAULT NULL COMMENT 'SQL 类型(仅 sql, mysql)',
+  VERSION     INT DEFAULT 1 COMMENT '版本号',
+  REMARK      VARCHAR(500) DEFAULT NULL COMMENT '备注(DESCRIPTION/REMARK)',
+  CREATEID    VARCHAR(64) DEFAULT NULL COMMENT '创建人ID',
+  CREATER     VARCHAR(64) DEFAULT NULL COMMENT '创建人姓名',
+  MODIFYID    VARCHAR(64) DEFAULT NULL COMMENT '修改人ID',
+  MODIFER     VARCHAR(64) DEFAULT NULL COMMENT '修改人姓名',
+  ISDELETED   TINYINT DEFAULT 0 COMMENT '逻辑删除',
+  CREATETIME  DATETIME DEFAULT NULL COMMENT '创建时间',
+  MODIFYTIME  DATETIME DEFAULT NULL COMMENT '修改时间',
+  PRIMARY KEY (ID),
+  UNIQUE KEY uk_path (MODULEPATH),
+  KEY idx_type_code (ASSETTYPE, CODE)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='统一代码资产表(C#脚本/SQL模板/JS模块/VUE组件)';
+
+-- -----------------------------------------------------------
+-- 2. 数据迁移(保留原 ID; 幂等: 按主键跳过已存在)
+-- -----------------------------------------------------------
+-- csharp: tss_api_script
+INSERT INTO tss_code_asset (ID, ASSETTYPE, CODE, NAME, SOURCECODE, VERSION, REMARK, ISDELETED)
+SELECT ID, 'csharp', SCRIPTCODE, SCRIPTNAME, SOURCECODE, VERSION, REMARK, ISDELETED
+FROM tss_api_script
+WHERE NOT EXISTS (SELECT 1 FROM tss_code_asset x WHERE x.ID = tss_api_script.ID);
+
+-- sql: tss_sql (主键 SQLID→ID, SQLTXT→SOURCECODE, REMARK 兼作 NAME)
+INSERT INTO tss_code_asset (ID, ASSETTYPE, CODE, NAME, SOURCECODE, SQLTYPE, REMARK, ISDELETED)
+SELECT SQLID, 'sql', SQLCODE, REMARK, SQLTXT, SQLTYPE, REMARK, 0
+FROM tss_sql
+WHERE NOT EXISTS (SELECT 1 FROM tss_code_asset x WHERE x.ID = tss_sql.SQLID);
+
+-- js/vue: tbs_sfc_template (ASSETTYPE=LOWER(FILETYPE), DESCRIPTION→REMARK)
+INSERT INTO tss_code_asset (ID, ASSETTYPE, CODE, NAME, MODULEPATH, FILETYPE, SOURCECODE, COMPILEDCODE, DEPS, REMARK, ISDELETED, CREATEDTIME, UPDATEDTIME)
+SELECT ID, LOWER(FILETYPE), TEMPLATECODE, TEMPLATENAME, MODULEPATH, FILETYPE, SOURCECODE, COMPILEDCODE, DEPS, DESCRIPTION, ISDELETED, CREATEDTIME, UPDATEDTIME
+FROM tbs_sfc_template
+WHERE NOT EXISTS (SELECT 1 FROM tss_code_asset x WHERE x.ID = tbs_sfc_template.ID);
+
+-- -----------------------------------------------------------
+-- 3. 新 TBS 资源注册: TBS_CODE_ASSET
+-- -----------------------------------------------------------
+INSERT INTO tss_resource (ID, RESOURCENAME, TABLENAME, RESOURCETYPE, TABLERESOURCEID, RESOURCEANAME, COMMENTS)
+SELECT 'tbs_code_asset_001', 'TBS_CODE_ASSET', 'tss_code_asset', 'TABLE', NULL, 'TSS_CODE_ASSET', '统一代码资产表'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resource WHERE ID='tbs_code_asset_001');
+
+-- TBS 字段(统一列名)
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, KEYGENTYPE, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_id', 'tbs_code_asset_001', NULL, 'ID', 'varchar', 1, 'GUID', 0, 36, '主键'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_id');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_type', 'tbs_code_asset_001', NULL, 'ASSETTYPE', 'varchar', 0, 0, 16, '资产类型'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_type');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_code', 'tbs_code_asset_001', NULL, 'CODE', 'varchar', 0, 0, 200, '编码'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_code');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_name', 'tbs_code_asset_001', NULL, 'NAME', 'varchar', 0, 1, 200, '名称'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_name');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_path', 'tbs_code_asset_001', NULL, 'MODULEPATH', 'varchar', 0, 1, 200, 'SFC 路径'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_path');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_ftype', 'tbs_code_asset_001', NULL, 'FILETYPE', 'varchar', 0, 1, 16, 'JS/VUE'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_ftype');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, COMMENTS)
+SELECT 'rf_ca_source', 'tbs_code_asset_001', NULL, 'SOURCECODE', 'text', 0, 1, '源码'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_source');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, COMMENTS)
+SELECT 'rf_ca_compiled', 'tbs_code_asset_001', NULL, 'COMPILEDCODE', 'text', 0, 1, '编译产物'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_compiled');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_deps', 'tbs_code_asset_001', NULL, 'DEPS', 'varchar', 0, 1, 2000, '依赖'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_deps');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_sqltype', 'tbs_code_asset_001', NULL, 'SQLTYPE', 'varchar', 0, 1, 16, 'SQL 类型'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_sqltype');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, COMMENTS)
+SELECT 'rf_ca_version', 'tbs_code_asset_001', NULL, 'VERSION', 'int', 0, 1, '版本号'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_version');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_remark', 'tbs_code_asset_001', NULL, 'REMARK', 'varchar', 0, 1, 500, '备注'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_remark');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, COMMENTS)
+SELECT 'rf_ca_isdeleted', 'tbs_code_asset_001', NULL, 'ISDELETED', 'int', 0, 1, '逻辑删除'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_isdeleted');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, COMMENTS)
+SELECT 'rf_ca_ctime', 'tbs_code_asset_001', NULL, 'CREATETIME', 'datetime', 0, 1, '创建时间'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_ctime');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, COMMENTS)
+SELECT 'rf_ca_utime', 'tbs_code_asset_001', NULL, 'MODIFYTIME', 'datetime', 0, 1, '修改时间'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_utime');
+
+-- -----------------------------------------------------------
+-- 4. 三个 VSS 视图重接到统一 TBS 资源
+--    机制: TABLERESOURCEID→tbs_code_asset_001, TABLENAME→tss_code_asset,
+--          resfield 的 REFFIELDID 按别名映射重指(SELECT 输出 FIELDNAME 不变,
+--          前端/DataTable/版本捕获/AI 工具零改动)
+-- -----------------------------------------------------------
+
+-- 4.1 VSS_API_SCRIPT (csharp): SCRIPTCODE→CODE, SCRIPTNAME→NAME, 其余同名
+UPDATE tss_resource SET TABLERESOURCEID='tbs_code_asset_001', TABLENAME='tss_code_asset' WHERE ID='vss_api_script_001';
+UPDATE tss_resfield v JOIN tss_resfield t ON t.RESOURCEID='tbs_code_asset_001'
+  AND t.FIELDNAME = CASE v.FIELDNAME
+    WHEN 'SCRIPTCODE' THEN 'CODE'
+    WHEN 'SCRIPTNAME' THEN 'NAME'
+    ELSE v.FIELDNAME END
+SET v.REFFIELDID = t.ID
+WHERE v.RESOURCEID='vss_api_script_001' AND v.REFFIELDID IS NOT NULL;
+-- ASSETTYPE 字段(新, 默认值兜底 csharp)
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, DEFAULTVALUE, COMMENTS)
+SELECT 'rf_vas_type', 'vss_api_script_001', 'rf_ca_type', 'ASSETTYPE', 'varchar', 0, 1, 16, 'csharp', '资产类型(默认csharp)'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vas_type');
+
+-- 4.2 VSS_SQL (sql): SQLCODE→CODE, SQLTXT→SOURCECODE, SQLID→ID, 其余同名
+UPDATE tss_resource SET TABLERESOURCEID='tbs_code_asset_001', TABLENAME='tss_code_asset' WHERE RESOURCENAME='VSS_SQL';
+UPDATE tss_resfield v JOIN tss_resfield t ON t.RESOURCEID='tbs_code_asset_001'
+  AND t.FIELDNAME = CASE v.FIELDNAME
+    WHEN 'SQLCODE' THEN 'CODE'
+    WHEN 'SQLTXT' THEN 'SOURCECODE'
+    WHEN 'SQLID' THEN 'ID'
+    ELSE v.FIELDNAME END
+SET v.REFFIELDID = t.ID
+WHERE v.RESOURCEID=(SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL') AND v.REFFIELDID IS NOT NULL;
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, DEFAULTVALUE, COMMENTS)
+SELECT 'rf_vsql_type', (SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL'), 'rf_ca_type', 'ASSETTYPE', 'varchar', 0, 1, 16, 'sql', '资产类型(默认sql)'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsql_type');
+
+-- 4.3 VCK_SFC_TEMPLATE (js/vue): TEMPLATECODE→CODE, TEMPLATENAME→NAME, DESCRIPTION→REMARK, 其余同名
+UPDATE tss_resource SET TABLERESOURCEID='tbs_code_asset_001', TABLENAME='tss_code_asset' WHERE ID='vck_sfc_tpl_001';
+UPDATE tss_resfield v JOIN tss_resfield t ON t.RESOURCEID='tbs_code_asset_001'
+  AND t.FIELDNAME = CASE v.FIELDNAME
+    WHEN 'TEMPLATECODE' THEN 'CODE'
+    WHEN 'TEMPLATENAME' THEN 'NAME'
+    WHEN 'DESCRIPTION' THEN 'REMARK'
+    ELSE v.FIELDNAME END
+SET v.REFFIELDID = t.ID
+WHERE v.RESOURCEID='vck_sfc_tpl_001' AND v.REFFIELDID IS NOT NULL;
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, DEFAULTVALUE, COMMENTS)
+SELECT 'rf_vsfc_type', 'vck_sfc_tpl_001', 'rf_ca_type', 'ASSETTYPE', 'varchar', 0, 1, 16, 'vue', '资产类型(默认vue)'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsfc_type');
+
+-- -----------------------------------------------------------
+-- 5. 过滤器加类型条件(防跨类型编码碰撞; NVelocity 禁单引号用 CHAR)
+--    csharp=CHAR(99,115,104,97,114,112) sql=CHAR(115,113,108) js=CHAR(106,115) vue=CHAR(118,117,101)
+-- -----------------------------------------------------------
+-- VSS_API_SCRIPT F01 列表
+UPDATE tss_resfilter SET FILTERSQL='1=1 AND A.ASSETTYPE=CHAR(99,115,104,97,114,112) AND A.ISDELETED=0' WHERE ID='rf_as_f01';
+-- VSS_SQL F01(SQLManage.GetSQL 用) + F04/F05 列表
+UPDATE tss_resfilter SET FILTERSQL='A.SQLCODE=@SQLCODE AND A.SQLTYPE=@SQLTYPE AND A.ASSETTYPE=CHAR(115,113,108)' WHERE RESOURCEID=(SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL') AND FILTERCODE='F01';
+UPDATE tss_resfilter SET FILTERSQL='1=1 AND A.ASSETTYPE=CHAR(115,113,108)
+#if("$!{INPUT}"!="")
+AND (A.SQLCODE LIKE CONCAT(CHAR(37),@INPUT,CHAR(37))
+OR A.SQLTYPE LIKE CONCAT(CHAR(37),@INPUT,CHAR(37))
+OR A.REMARK LIKE CONCAT(CHAR(37),@INPUT,CHAR(37)))
+#end' WHERE RESOURCEID=(SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL') AND FILTERCODE='F04';
+UPDATE tss_resfilter SET FILTERSQL='1=1 AND A.ASSETTYPE=CHAR(115,113,108)
+#if("$!{SQLCODE}"!="")
+AND A.SQLCODE LIKE CONCAT(CHAR(37),@SQLCODE,CHAR(37))
+#end
+#if("$!{SQLTYPE}"!="")
+AND A.SQLTYPE = @SQLTYPE
+#end
+#if("$!{REMARK}"!="")
+AND A.REMARK LIKE CONCAT(CHAR(37),@REMARK,CHAR(37))
+#end' WHERE RESOURCEID=(SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL') AND FILTERCODE='F05';
+-- VCK_SFC_TEMPLATE F01 列表(js+vue 两类)
+UPDATE tss_resfilter SET FILTERSQL='1=1 AND A.ASSETTYPE IN (CHAR(106,115),CHAR(118,117,101)) AND A.ISDELETED=0' WHERE RESOURCEID='vck_sfc_tpl_001' AND FILTERCODE='F01';
+
+-- -----------------------------------------------------------
+-- 6. SS_MOD_CODEFILES 重写(三张表 → 统一表)
+-- -----------------------------------------------------------
+UPDATE tss_sql SET SQLTXT='SELECT 1 AS KIND, S.ID AS RID, S.CODE, S.NAME, S.MODULEPATH, A.APICODE, A.APINAME
+FROM tss_code_asset S
+LEFT JOIN tss_moudleapi A ON A.SCRIPTCODE=S.CODE AND A.MODULEID=(SELECT ID FROM tss_moudle WHERE MODULECODE=@MODULECODE)
+WHERE S.ISDELETED=0 AND S.ASSETTYPE=CHAR(99,115,104,97,114,112) AND (A.ID IS NOT NULL OR S.CODE LIKE CONCAT(CHAR(83,67,95),@MODULECODE,CHAR(37)))
+UNION ALL
+SELECT 2 AS KIND, Q.ID AS RID, Q.CODE, Q.NAME, Q.MODULEPATH, A.APICODE, A.APINAME
+FROM tss_code_asset Q
+LEFT JOIN tss_moudleapi A ON A.SQLID=Q.CODE AND A.MODULEID=(SELECT ID FROM tss_moudle WHERE MODULECODE=@MODULECODE)
+WHERE Q.ASSETTYPE=CHAR(115,113,108) AND (A.ID IS NOT NULL OR Q.CODE LIKE CONCAT(CHAR(83,83,95),@MODULECODE,CHAR(37)))
+UNION ALL
+SELECT 3 AS KIND, T.ID AS RID, T.CODE, T.NAME, T.MODULEPATH, T.FILETYPE AS APICODE, T.REMARK AS APINAME
+FROM tss_code_asset T
+WHERE T.ISDELETED=0 AND T.ASSETTYPE=CHAR(106,115) AND T.MODULEPATH LIKE CONCAT(CHAR(37),CHAR(47),CHAR(109,111,100,117,108,101,115,47),@MODULECODE,CHAR(37))
+ORDER BY KIND, CODE' WHERE SQLCODE='SS_MOD_CODEFILES';
+
+-- -----------------------------------------------------------
+-- 7. 字段标准化补充(2026-07-17): 人员/时间字段按 CREATEID/CREATER/MODIFYID/MODIFER/CREATETIME/MODIFYTIME 标准
+--    已部署环境的纠正(幂等): 列改名 + 新增人员字段 + resfield 补注册
+-- -----------------------------------------------------------
+SET @c1 := (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='tss_code_asset' AND COLUMN_NAME='CREATEDTIME');
+SET @sql1 := IF(@c1>0, 'ALTER TABLE tss_code_asset CHANGE CREATEDTIME CREATETIME DATETIME NULL COMMENT ''创建时间''', 'SELECT 1');
+PREPARE st1 FROM @sql1; EXECUTE st1; DEALLOCATE PREPARE st1;
+SET @c2 := (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='tss_code_asset' AND COLUMN_NAME='UPDATEDTIME');
+SET @sql2 := IF(@c2>0, 'ALTER TABLE tss_code_asset CHANGE UPDATEDTIME MODIFYTIME DATETIME NULL COMMENT ''修改时间''', 'SELECT 1');
+PREPARE st2 FROM @sql2; EXECUTE st2; DEALLOCATE PREPARE st2;
+SET @c3 := (SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='tss_code_asset' AND COLUMN_NAME='CREATEID');
+SET @sql3 := IF(@c3=0, 'ALTER TABLE tss_code_asset ADD COLUMN CREATEID VARCHAR(64) NULL COMMENT ''创建人ID'' AFTER REMARK, ADD COLUMN CREATER VARCHAR(64) NULL COMMENT ''创建人姓名'' AFTER CREATEID, ADD COLUMN MODIFYID VARCHAR(64) NULL COMMENT ''修改人ID'' AFTER CREATER, ADD COLUMN MODIFER VARCHAR(64) NULL COMMENT ''修改人姓名'' AFTER MODIFYID', 'SELECT 1');
+PREPARE st3 FROM @sql3; EXECUTE st3; DEALLOCATE PREPARE st3;
+
+UPDATE tss_resfield SET FIELDNAME='CREATETIME' WHERE ID='rf_ca_ctime';
+UPDATE tss_resfield SET FIELDNAME='MODIFYTIME' WHERE ID='rf_ca_utime';
+
+-- TBS 人员字段
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_createid', 'tbs_code_asset_001', NULL, 'CREATEID', 'varchar', 0, 1, 64, '创建人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_createid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_creater', 'tbs_code_asset_001', NULL, 'CREATER', 'varchar', 0, 1, 64, '创建人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_creater');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_modifyid', 'tbs_code_asset_001', NULL, 'MODIFYID', 'varchar', 0, 1, 64, '修改人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_modifyid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_ca_modifer', 'tbs_code_asset_001', NULL, 'MODIFER', 'varchar', 0, 1, 64, '修改人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_ca_modifer');
+
+-- vck_sfc VSS 的 CREATEDTIME/UPDATEDTIME 字段重指标准列(别名保前端字段名)
+UPDATE tss_resfield v JOIN tss_resfield t ON t.RESOURCEID='tbs_code_asset_001' AND t.FIELDNAME='CREATETIME'
+SET v.REFFIELDID=t.ID WHERE v.RESOURCEID='vck_sfc_tpl_001' AND v.FIELDNAME='CREATEDTIME';
+UPDATE tss_resfield v JOIN tss_resfield t ON t.RESOURCEID='tbs_code_asset_001' AND t.FIELDNAME='MODIFYTIME'
+SET v.REFFIELDID=t.ID WHERE v.RESOURCEID='vck_sfc_tpl_001' AND v.FIELDNAME='UPDATEDTIME';
+
+-- VSS_API_SCRIPT 人员/时间字段
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vas_createid', 'vss_api_script_001', 'rf_ca_createid', 'CREATEID', 'varchar', 0, 1, 64, '创建人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vas_createid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vas_creater', 'vss_api_script_001', 'rf_ca_creater', 'CREATER', 'varchar', 0, 1, 64, '创建人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vas_creater');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vas_modifyid', 'vss_api_script_001', 'rf_ca_modifyid', 'MODIFYID', 'varchar', 0, 1, 64, '修改人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vas_modifyid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vas_modifer', 'vss_api_script_001', 'rf_ca_modifer', 'MODIFER', 'varchar', 0, 1, 64, '修改人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vas_modifer');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vas_mtime', 'vss_api_script_001', 'rf_ca_utime', 'MODIFYTIME', 'datetime', 0, 1, NULL, '修改时间'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vas_mtime');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vas_ctime', 'vss_api_script_001', 'rf_ca_ctime', 'CREATETIME', 'datetime', 0, 1, NULL, '创建时间'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vas_ctime');
+
+-- VSS_SQL 人员/时间字段
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsql_createid', (SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL'), 'rf_ca_createid', 'CREATEID', 'varchar', 0, 1, 64, '创建人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsql_createid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsql_creater', (SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL'), 'rf_ca_creater', 'CREATER', 'varchar', 0, 1, 64, '创建人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsql_creater');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsql_modifyid', (SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL'), 'rf_ca_modifyid', 'MODIFYID', 'varchar', 0, 1, 64, '修改人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsql_modifyid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsql_modifer', (SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL'), 'rf_ca_modifer', 'MODIFER', 'varchar', 0, 1, 64, '修改人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsql_modifer');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsql_mtime', (SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL'), 'rf_ca_utime', 'MODIFYTIME', 'datetime', 0, 1, NULL, '修改时间'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsql_mtime');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsql_ctime', (SELECT ID FROM tss_resource WHERE RESOURCENAME='VSS_SQL'), 'rf_ca_ctime', 'CREATETIME', 'datetime', 0, 1, NULL, '创建时间'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsql_ctime');
+
+-- VCK_SFC_TEMPLATE 人员字段
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsfc_createid', 'vck_sfc_tpl_001', 'rf_ca_createid', 'CREATEID', 'varchar', 0, 1, 64, '创建人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsfc_createid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsfc_creater', 'vck_sfc_tpl_001', 'rf_ca_creater', 'CREATER', 'varchar', 0, 1, 64, '创建人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsfc_creater');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsfc_modifyid', 'vck_sfc_tpl_001', 'rf_ca_modifyid', 'MODIFYID', 'varchar', 0, 1, 64, '修改人ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsfc_modifyid');
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDTYPE, ISKEY, NULLABLE, FIELDLENGTH, COMMENTS)
+SELECT 'rf_vsfc_modifer', 'vck_sfc_tpl_001', 'rf_ca_modifer', 'MODIFER', 'varchar', 0, 1, 64, '修改人姓名'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID='rf_vsfc_modifer');

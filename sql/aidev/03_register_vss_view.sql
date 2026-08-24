@@ -1,0 +1,378 @@
+-- ============================================================
+-- AI 开发助理模块 Chunk 1 — VSS 视图资源 + resfield
+-- 6 个 VSS 视图: VSS_AIDEV_SESSION/CHANGESET/CHANGEITEM/UPGRADE/UPGRADE_LOG/UPGRADE_SNAPSHOT
+-- 铁律:
+--   1. VSS 的 TABLERESOURCEID 指向对应 TBS ID, RESOURCEANAME='A'
+--   2. VSS 字段 REFFIELDID 必须指向对应 TBS 字段 ID (不能 NULL)
+--   3. VSS 的 ID 字段 ISKEY=1 KEYGENTYPE=GUID
+--   4. 引用人员字段: REFRESOURCEID 指向 TBS_EMP(770072c4-0750-11ea-9e8d-00163e067045 TABLE类型)
+--      REFRESOURCEANAME='B', REFRELATION='A.XXX=B.ID'
+--      名称字段 REFFIELDID 指向 TBS_EMP.EMPNAME(936de29c-0750-11ea-9e8d-00163e067045), UPFIELDID 指向本地 ID 字段
+--   5. 引用名称字段是虚拟的, 只在 VSS resfield 插入, 物理表只有 ID 字段
+-- ============================================================
+
+-- ============================================================
+-- 1. tss_resource — 6 个 VSS 视图资源
+-- ============================================================
+INSERT INTO tss_resource (ID, RESOURCENAME, RESOURCEANAME, TABLENAME, RESOURCETYPE, TABLERESOURCEID)
+SELECT 'vss_aidev_session_001', 'VSS_AIDEV_SESSION', 'A', 'tss_aidev_session', 'DATAVIEW', 'tss_aidev_session_001'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resource WHERE ID = 'vss_aidev_session_001');
+
+INSERT INTO tss_resource (ID, RESOURCENAME, RESOURCEANAME, TABLENAME, RESOURCETYPE, TABLERESOURCEID)
+SELECT 'vss_aidev_changeset_001', 'VSS_AIDEV_CHANGESET', 'A', 'tss_aidev_changeset', 'DATAVIEW', 'tss_aidev_changeset_001'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resource WHERE ID = 'vss_aidev_changeset_001');
+
+INSERT INTO tss_resource (ID, RESOURCENAME, RESOURCEANAME, TABLENAME, RESOURCETYPE, TABLERESOURCEID)
+SELECT 'vss_aidev_changeitem_001', 'VSS_AIDEV_CHANGEITEM', 'A', 'tss_aidev_changeitem', 'DATAVIEW', 'tss_aidev_changeitem_001'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resource WHERE ID = 'vss_aidev_changeitem_001');
+
+INSERT INTO tss_resource (ID, RESOURCENAME, RESOURCEANAME, TABLENAME, RESOURCETYPE, TABLERESOURCEID)
+SELECT 'vss_aidev_upgrade_001', 'VSS_AIDEV_UPGRADE', 'A', 'tss_aidev_upgrade', 'DATAVIEW', 'tss_aidev_upgrade_001'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resource WHERE ID = 'vss_aidev_upgrade_001');
+
+INSERT INTO tss_resource (ID, RESOURCENAME, RESOURCEANAME, TABLENAME, RESOURCETYPE, TABLERESOURCEID)
+SELECT 'vss_aidev_upgrade_log_001', 'VSS_AIDEV_UPGRADE_LOG', 'A', 'tss_aidev_upgrade_log', 'DATAVIEW', 'tss_aidev_upgrade_log_001'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resource WHERE ID = 'vss_aidev_upgrade_log_001');
+
+INSERT INTO tss_resource (ID, RESOURCENAME, RESOURCEANAME, TABLENAME, RESOURCETYPE, TABLERESOURCEID)
+SELECT 'vss_aidev_upgrade_snapshot_001', 'VSS_AIDEV_UPGRADE_SNAPSHOT', 'A', 'tss_aidev_upgrade_snapshot', 'DATAVIEW', 'tss_aidev_upgrade_snapshot_001'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resource WHERE ID = 'vss_aidev_upgrade_snapshot_001');
+
+-- ============================================================
+-- 2. tss_resfield — VSS_AIDEV_SESSION 字段 (13 物理字段 + 1 虚拟名称字段 = 14)
+-- 引用字段: CREATEDBY -> TBS_EMP.EMPNAME AS CREATEDBYNAME
+-- ============================================================
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_id', 'vss_aidev_session_001', 'rf_aisess_id', 'ID', '主键', 'varchar', NULL, 0, 36, '主键', 1, 'GUID', NULL, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_id');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_code', 'vss_aidev_session_001', 'rf_aisess_code', 'SESSIONCODE', '会话编码', 'varchar', NULL, 0, 50, '会话编码', 0, NULL, NULL, 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_code');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_name', 'vss_aidev_session_001', 'rf_aisess_name', 'SESSIONNAME', '会话名称', 'varchar', NULL, 0, 200, '会话名称', 0, NULL, NULL, 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_name');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_type', 'vss_aidev_session_001', 'rf_aisess_type', 'SESSIONTYPE', '会话类型', 'varchar', NULL, 1, 16, '会话类型', 0, NULL, NULL, 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_type');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_tmod', 'vss_aidev_session_001', 'rf_aisess_tmod', 'TARGETMODULE', '目标模块', 'varchar', NULL, 1, 64, '目标模块编码', 0, NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_tmod');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_intent', 'vss_aidev_session_001', 'rf_aisess_intent', 'INTENT', '开发意图', 'text', NULL, 1, 0, '开发意图描述', 0, NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_intent');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_status', 'vss_aidev_session_001', 'rf_aisess_status', 'STATUS', '状态', 'varchar', NULL, 0, 16, '状态', 0, NULL, 'DRAFT', 7
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_status');
+
+-- CREATEDBY: 引用 TBS_EMP, REFRESOURCEANAME=B, REFRELATION=A.CREATEDBY=B.ID
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM, REFRESOURCEID, REFRESOURCEANAME, REFRELATION)
+SELECT 'rf_vaisess_cby', 'vss_aidev_session_001', 'rf_aisess_cby', 'CREATEDBY', '创建人', 'varchar', NULL, 1, 36, '创建人ID', 0, NULL, NULL, 8, '770072c4-0750-11ea-9e8d-00163e067045', 'B', 'A.CREATEDBY=B.ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_cby');
+
+-- CREATEDBYNAME: 虚拟名称字段, REFFIELDID 指向 TBS_EMP.EMPNAME, UPFIELDID 指向本地 CREATEDBY 字段
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM, REFRESOURCEID, REFRESOURCEANAME, REFRELATION, UPFIELDID)
+SELECT 'rf_vaisess_cbyname', 'vss_aidev_session_001', '936de29c-0750-11ea-9e8d-00163e067045', 'CREATEDBYNAME', '创建人姓名', 'varchar', NULL, 1, 50, '创建人姓名', 0, NULL, NULL, 9, '770072c4-0750-11ea-9e8d-00163e067045', 'B', 'A.CREATEDBY=B.ID', 'rf_vaisess_cby'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_cbyname');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_ctime', 'vss_aidev_session_001', 'rf_aisess_ctime', 'CREATEDTIME', '创建时间', 'datetime', NULL, 1, 0, '创建时间', 0, NULL, NULL, 10
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_ctime');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_close', 'vss_aidev_session_001', 'rf_aisess_close', 'CLOSEDATE', '关闭日期', 'datetime', NULL, 1, 0, '关闭日期', 0, NULL, NULL, 11
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_close');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_csid', 'vss_aidev_session_001', 'rf_aisess_csid', 'CHANGESETID', '变更包ID', 'varchar', NULL, 1, 36, '关联变更包ID', 0, NULL, NULL, 12
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_csid');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_remark', 'vss_aidev_session_001', 'rf_aisess_remark', 'REMARK', '备注', 'varchar', NULL, 1, 500, '备注', 0, NULL, NULL, 13
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_remark');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaisess_isdel', 'vss_aidev_session_001', 'rf_aisess_isdel', 'ISDELETED', '是否删除', 'int', NULL, 0, 1, '是否删除', 0, NULL, '0', 14
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaisess_isdel');
+
+-- ============================================================
+-- 3. tss_resfield — VSS_AIDEV_CHANGESET 字段 (11 物理字段, 无引用字段)
+-- ============================================================
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_id', 'vss_aidev_changeset_001', 'rf_aics_id', 'ID', '主键', 'varchar', NULL, 0, 36, '主键', 1, 'GUID', NULL, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_id');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_sid', 'vss_aidev_changeset_001', 'rf_aics_sid', 'SESSIONID', '会话ID', 'varchar', NULL, 0, 36, '会话ID', 0, NULL, NULL, 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_sid');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_code', 'vss_aidev_changeset_001', 'rf_aics_code', 'CHANGESETCODE', '变更包编码', 'varchar', NULL, 0, 50, '变更包编码', 0, NULL, NULL, 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_code');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_title', 'vss_aidev_changeset_001', 'rf_aics_title', 'TITLE', '标题', 'varchar', NULL, 1, 200, '标题', 0, NULL, NULL, 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_title');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_src', 'vss_aidev_changeset_001', 'rf_aics_src', 'SOURCE', '来源', 'varchar', NULL, 1, 16, '来源', 0, NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_src');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_intent', 'vss_aidev_changeset_001', 'rf_aics_intent', 'INTENT', '意图', 'text', NULL, 1, 0, '意图描述', 0, NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_intent');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_vp', 'vss_aidev_changeset_001', 'rf_aics_vp', 'VALIDATIONPASSED', '校验通过', 'int', NULL, 0, 1, '校验是否通过', 0, NULL, '0', 7
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_vp');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_vr', 'vss_aidev_changeset_001', 'rf_aics_vr', 'VALIDATIONREPORT', '校验报告', 'text', NULL, 1, 0, '校验报告', 0, NULL, NULL, 8
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_vr');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_cnt', 'vss_aidev_changeset_001', 'rf_aics_cnt', 'ITEMCOUNT', '项数量', 'int', NULL, 0, 11, '变更项数量', 0, NULL, '0', 9
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_cnt');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_ctime', 'vss_aidev_changeset_001', 'rf_aics_ctime', 'CREATEDTIME', '创建时间', 'datetime', NULL, 1, 0, '创建时间', 0, NULL, NULL, 10
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_ctime');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaics_isdel', 'vss_aidev_changeset_001', 'rf_aics_isdel', 'ISDELETED', '是否删除', 'int', NULL, 0, 1, '是否删除', 0, NULL, '0', 11
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaics_isdel');
+
+-- ============================================================
+-- 4. tss_resfield — VSS_AIDEV_CHANGEITEM 字段 (17 物理字段 + 1 虚拟名称字段 = 18)
+-- 引用字段: CONFIRMEDBY -> TBS_EMP.EMPNAME AS CONFIRMEDBYNAME
+-- ============================================================
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_id', 'vss_aidev_changeitem_001', 'rf_aici_id', 'ID', '主键', 'varchar', NULL, 0, 36, '主键', 1, 'GUID', NULL, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_id');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_csid', 'vss_aidev_changeitem_001', 'rf_aici_csid', 'CHANGESETID', '变更包ID', 'varchar', NULL, 0, 36, '变更包ID', 0, NULL, NULL, 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_csid');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_seq', 'vss_aidev_changeitem_001', 'rf_aici_seq', 'ITEMSEQ', '项序号', 'int', NULL, 1, 11, '项序号', 0, NULL, NULL, 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_seq');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_cat', 'vss_aidev_changeitem_001', 'rf_aici_cat', 'CATEGORY', '类别', 'varchar', NULL, 1, 32, '类别', 0, NULL, NULL, 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_cat');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_act', 'vss_aidev_changeitem_001', 'rf_aici_act', 'ACTION', '操作', 'varchar', NULL, 1, 16, '操作', 0, NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_act');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_tool', 'vss_aidev_changeitem_001', 'rf_aici_tool', 'TOOL', '工具', 'varchar', NULL, 1, 64, '生成工具', 0, NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_tool');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_tgt', 'vss_aidev_changeitem_001', 'rf_aici_tgt', 'TARGET', '目标', 'varchar', NULL, 1, 128, '目标对象', 0, NULL, NULL, 7
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_tgt');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_sql', 'vss_aidev_changeitem_001', 'rf_aici_sql', 'SQLCONTENT', 'SQL内容', 'text', NULL, 1, 0, 'SQL内容', 0, NULL, NULL, 8
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_sql');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_md', 'vss_aidev_changeitem_001', 'rf_aici_md', 'METADATA', '元数据', 'text', NULL, 1, 0, '元数据JSON', 0, NULL, NULL, 9
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_md');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_rat', 'vss_aidev_changeitem_001', 'rf_aici_rat', 'RATIONALE', '理由', 'text', NULL, 1, 0, '设计理由', 0, NULL, NULL, 10
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_rat');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_warn', 'vss_aidev_changeitem_001', 'rf_aici_warn', 'WARNINGS', '警告', 'text', NULL, 1, 0, '警告信息', 0, NULL, NULL, 11
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_warn');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_dep', 'vss_aidev_changeitem_001', 'rf_aici_dep', 'DEPENDSON', '依赖项', 'varchar', NULL, 1, 500, '依赖项ID列表', 0, NULL, NULL, 12
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_dep');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_status', 'vss_aidev_changeitem_001', 'rf_aici_status', 'ITEMSTATUS', '项状态', 'varchar', NULL, 0, 16, '项状态', 0, NULL, 'DRAFT', 13
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_status');
+
+-- CONFIRMEDBY: 引用 TBS_EMP, REFRESOURCEANAME=B, REFRELATION=A.CONFIRMEDBY=B.ID
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM, REFRESOURCEID, REFRESOURCEANAME, REFRELATION)
+SELECT 'rf_vaici_cb', 'vss_aidev_changeitem_001', 'rf_aici_cb', 'CONFIRMEDBY', '确认人', 'varchar', NULL, 1, 36, '确认人ID', 0, NULL, NULL, 14, '770072c4-0750-11ea-9e8d-00163e067045', 'B', 'A.CONFIRMEDBY=B.ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_cb');
+
+-- CONFIRMEDBYNAME: 虚拟名称字段, REFFIELDID 指向 TBS_EMP.EMPNAME, UPFIELDID 指向本地 CONFIRMEDBY 字段
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM, REFRESOURCEID, REFRESOURCEANAME, REFRELATION, UPFIELDID)
+SELECT 'rf_vaici_cbname', 'vss_aidev_changeitem_001', '936de29c-0750-11ea-9e8d-00163e067045', 'CONFIRMEDBYNAME', '确认人姓名', 'varchar', NULL, 1, 50, '确认人姓名', 0, NULL, NULL, 15, '770072c4-0750-11ea-9e8d-00163e067045', 'B', 'A.CONFIRMEDBY=B.ID', 'rf_vaici_cb'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_cbname');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_ctime', 'vss_aidev_changeitem_001', 'rf_aici_ctime', 'CONFIRMEDTIME', '确认时间', 'datetime', NULL, 1, 0, '确认时间', 0, NULL, NULL, 16
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_ctime');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_corder', 'vss_aidev_changeitem_001', 'rf_aici_corder', 'CONFIRMORDER', '确认顺序', 'int', NULL, 1, 11, '确认顺序', 0, NULL, NULL, 17
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_corder');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaici_isdel', 'vss_aidev_changeitem_001', 'rf_aici_isdel', 'ISDELETED', '是否删除', 'int', NULL, 0, 1, '是否删除', 0, NULL, '0', 18
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaici_isdel');
+
+-- ============================================================
+-- 5. tss_resfield — VSS_AIDEV_UPGRADE 字段 (17 物理字段 + 1 虚拟名称字段 = 18)
+-- 引用字段: EXECUTEDBY -> TBS_EMP.EMPNAME AS EXECUTEDBYNAME
+-- ============================================================
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_id', 'vss_aidev_upgrade_001', 'rf_aiupg_id', 'ID', '主键', 'varchar', NULL, 0, 36, '主键', 1, 'GUID', NULL, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_id');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_code', 'vss_aidev_upgrade_001', 'rf_aiupg_code', 'UPGRADECODE', '升级编码', 'varchar', NULL, 0, 50, '升级编码', 0, NULL, NULL, 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_code');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_scode', 'vss_aidev_upgrade_001', 'rf_aiupg_scode', 'SESSIONCODE', '会话编码', 'varchar', NULL, 1, 50, '会话编码', 0, NULL, NULL, 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_scode');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_sname', 'vss_aidev_upgrade_001', 'rf_aiupg_sname', 'SESSIONNAME', '会话名称', 'varchar', NULL, 1, 200, '会话名称', 0, NULL, NULL, 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_sname');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_stype', 'vss_aidev_upgrade_001', 'rf_aiupg_stype', 'SESSIONTYPE', '会话类型', 'varchar', NULL, 1, 16, '会话类型', 0, NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_stype');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_tmod', 'vss_aidev_upgrade_001', 'rf_aiupg_tmod', 'TARGETMODULE', '目标模块', 'varchar', NULL, 1, 64, '目标模块编码', 0, NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_tmod');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_intent', 'vss_aidev_upgrade_001', 'rf_aiupg_intent', 'INTENT', '意图', 'text', NULL, 1, 0, '意图描述', 0, NULL, NULL, 7
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_intent');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_script', 'vss_aidev_upgrade_001', 'rf_aiupg_script', 'SCRIPTCONTENT', '脚本内容', 'text', NULL, 1, 0, '脚本内容', 0, NULL, NULL, 8
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_script');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_hash', 'vss_aidev_upgrade_001', 'rf_aiupg_hash', 'SCRIPTHASH', '脚本哈希', 'varchar', NULL, 1, 64, '脚本哈希', 0, NULL, NULL, 9
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_hash');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_cnt', 'vss_aidev_upgrade_001', 'rf_aiupg_cnt', 'ITEMCOUNT', '项数量', 'int', NULL, 0, 11, '变更项数量', 0, NULL, '0', 10
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_cnt');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_status', 'vss_aidev_upgrade_001', 'rf_aiupg_status', 'STATUS', '状态', 'varchar', NULL, 0, 16, '状态', 0, NULL, 'PENDING', 11
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_status');
+
+-- EXECUTEDBY: 引用 TBS_EMP, REFRESOURCEANAME=B, REFRELATION=A.EXECUTEDBY=B.ID
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM, REFRESOURCEID, REFRESOURCEANAME, REFRELATION)
+SELECT 'rf_vaiupg_eby', 'vss_aidev_upgrade_001', 'rf_aiupg_eby', 'EXECUTEDBY', '执行人', 'varchar', NULL, 1, 36, '执行人ID', 0, NULL, NULL, 12, '770072c4-0750-11ea-9e8d-00163e067045', 'B', 'A.EXECUTEDBY=B.ID'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_eby');
+
+-- EXECUTEDBYNAME: 虚拟名称字段, REFFIELDID 指向 TBS_EMP.EMPNAME, UPFIELDID 指向本地 EXECUTEDBY 字段
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM, REFRESOURCEID, REFRESOURCEANAME, REFRELATION, UPFIELDID)
+SELECT 'rf_vaiupg_ebyname', 'vss_aidev_upgrade_001', '936de29c-0750-11ea-9e8d-00163e067045', 'EXECUTEDBYNAME', '执行人姓名', 'varchar', NULL, 1, 50, '执行人姓名', 0, NULL, NULL, 13, '770072c4-0750-11ea-9e8d-00163e067045', 'B', 'A.EXECUTEDBY=B.ID', 'rf_vaiupg_eby'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_ebyname');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_etime', 'vss_aidev_upgrade_001', 'rf_aiupg_etime', 'EXECUTEDTIME', '执行时间', 'datetime', NULL, 1, 0, '执行时间', 0, NULL, NULL, 14
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_etime');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_dur', 'vss_aidev_upgrade_001', 'rf_aiupg_dur', 'DURATIONMS', '耗时', 'int', NULL, 1, 11, '执行时长毫秒', 0, NULL, NULL, 15
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_dur');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_err', 'vss_aidev_upgrade_001', 'rf_aiupg_err', 'ERRORMSG', '错误信息', 'text', NULL, 1, 0, '错误信息', 0, NULL, NULL, 16
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_err');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_rb', 'vss_aidev_upgrade_001', 'rf_aiupg_rb', 'ROLLBACKSCRIPT', '回滚脚本', 'text', NULL, 1, 0, '回滚脚本', 0, NULL, NULL, 17
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_rb');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupg_isdel', 'vss_aidev_upgrade_001', 'rf_aiupg_isdel', 'ISDELETED', '是否删除', 'int', NULL, 0, 1, '是否删除', 0, NULL, '0', 18
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupg_isdel');
+
+-- ============================================================
+-- 6. tss_resfield — VSS_AIDEV_UPGRADE_LOG 字段 (11 物理字段, 无引用字段)
+-- ============================================================
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_id', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_id', 'ID', '主键', 'varchar', NULL, 0, 36, '主键', 1, 'GUID', NULL, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_id');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_uid', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_uid', 'UPGRADEID', '升级ID', 'varchar', NULL, 0, 36, '升级记录ID', 0, NULL, NULL, 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_uid');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_iid', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_iid', 'ITEMID', '变更项ID', 'varchar', NULL, 1, 36, '变更项ID', 0, NULL, NULL, 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_iid');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_icat', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_icat', 'ITEMCATEGORY', '项类别', 'varchar', NULL, 1, 32, '项类别', 0, NULL, NULL, 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_icat');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_iact', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_iact', 'ITEMACTION', '项操作', 'varchar', NULL, 1, 16, '项操作', 0, NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_iact');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_itgt', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_itgt', 'ITEMTARGET', '项目标', 'varchar', NULL, 1, 128, '项目标', 0, NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_itgt');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_sql', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_sql', 'SQLSNIPPET', 'SQL片段', 'text', NULL, 1, 0, 'SQL片段', 0, NULL, NULL, 7
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_sql');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_status', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_status', 'STATUS', '状态', 'varchar', NULL, 1, 16, '状态', 0, NULL, NULL, 8
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_status');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_err', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_err', 'ERRORMSG', '错误信息', 'text', NULL, 1, 0, '错误信息', 0, NULL, NULL, 9
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_err');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_rows', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_rows', 'ROWSAFFECTED', '影响行数', 'int', NULL, 1, 11, '影响行数', 0, NULL, NULL, 10
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_rows');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgl_etime', 'vss_aidev_upgrade_log_001', 'rf_aiupgl_etime', 'EXECUTEDTIME', '执行时间', 'datetime', NULL, 1, 0, '执行时间', 0, NULL, NULL, 11
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgl_etime');
+
+-- ============================================================
+-- 7. tss_resfield — VSS_AIDEV_UPGRADE_SNAPSHOT 字段 (6 物理字段, 无引用字段)
+-- ============================================================
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgs_id', 'vss_aidev_upgrade_snapshot_001', 'rf_aiupgs_id', 'ID', '主键', 'varchar', NULL, 0, 36, '主键', 1, 'GUID', NULL, 1
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgs_id');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgs_uid', 'vss_aidev_upgrade_snapshot_001', 'rf_aiupgs_uid', 'UPGRADEID', '升级ID', 'varchar', NULL, 0, 36, '升级记录ID', 0, NULL, NULL, 2
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgs_uid');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgs_otype', 'vss_aidev_upgrade_snapshot_001', 'rf_aiupgs_otype', 'OBJECTTYPE', '对象类型', 'varchar', NULL, 1, 32, '对象类型', 0, NULL, NULL, 3
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgs_otype');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgs_oname', 'vss_aidev_upgrade_snapshot_001', 'rf_aiupgs_oname', 'OBJECTNAME', '对象名称', 'varchar', NULL, 1, 128, '对象名称', 0, NULL, NULL, 4
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgs_oname');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgs_before', 'vss_aidev_upgrade_snapshot_001', 'rf_aiupgs_before', 'SNAPSHOTBEFORE', '变更前', 'text', NULL, 1, 0, '变更前快照', 0, NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgs_before');
+
+INSERT INTO tss_resfield (ID, RESOURCEID, REFFIELDID, FIELDNAME, FIELDANAME, FIELDTYPE, PREC, NULLABLE, FIELDLENGTH, COMMENTS, ISKEY, KEYGENTYPE, DEFAULTVALUE, ENTRYNUM)
+SELECT 'rf_vaiupgs_after', 'vss_aidev_upgrade_snapshot_001', 'rf_aiupgs_after', 'SNAPSHOTAFTER', '变更后', 'text', NULL, 1, 0, '变更后快照', 0, NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_resfield WHERE ID = 'rf_vaiupgs_after');

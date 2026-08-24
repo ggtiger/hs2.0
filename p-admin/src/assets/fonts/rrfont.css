@@ -1,0 +1,67 @@
+@font-face {
+  font-family: "rrfont";
+  src: url("rrfont.eot?t=1565074799700"); /* IE9 */
+  src: url("rrfont.eot?t=1565074799700#iefix") format("embedded-opentype"),
+    /* IE6-IE8 */ url("rrfont.woff?t=1565074799700") format("woff"),
+    url("rrfont.ttf?t=1565074799700") format("truetype"),
+    /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+      url("rrfont.svg?t=1565074799700#iconfont") format("svg"); /* iOS 4.1- */
+}
+
+.rr-font {
+  font-family: "rrfont" !important;
+  font-size: inherit;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.rr-font-shouqi:before {
+  content: "\e711";
+}
+.rr-font-zhankai:before {
+  content: "\e710";
+}
+.rr-font-shangyiye-right:before {
+  content: "\e600";
+}
+
+.rr-font-xiayiduan:before {
+  content: "\e64e";
+}
+
+.rr-font-next:before {
+  content: "\e6b6";
+}
+
+.rr-font-prev:before {
+  content: "\e712";
+}
+
+.rr-font-shangyiye-left:before {
+  content: "\e713";
+}
+
+.rr-font-shangyiduan:before {
+  content: "\e714";
+}
+
+.rr-font-align-right:before {
+  content: "\e602";
+}
+
+.rr-font-align-center:before {
+  content: "\e93a";
+}
+
+.rr-font-align-left:before {
+  content: "\e601";
+}
+
+.rr-font-bold:before {
+  content: "\e67a";
+}
+
+.rr-font-dayin:before {
+  content: "\e655";
+}

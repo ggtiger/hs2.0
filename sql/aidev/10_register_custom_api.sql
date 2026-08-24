@@ -1,0 +1,74 @@
+-- ============================================================
+-- AI 开发助理 — 自定义接口 moudleapi 补配 (Chunk 3 遗漏)
+-- RS_MAIDEV 的 A05-A13 自定义接口之前只写了 Controller，没配 tss_moudleapi
+-- DataController.Call 先 MD.GetAPI(ApiCode) 找不到记录会直接返回"接口编码不存在！"
+-- 自定义接口的 APITYPE 和 ACTIONCODE 置空(不在已知 switch 列表里) 才会走到 default -> doMyApi
+-- 幂等写法，可重复执行
+-- ============================================================
+
+SET @mid = (SELECT ID FROM tss_moudle WHERE MODULECODE='RS_MAIDEV');
+
+-- A05 generate: AI 生成
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a05', @mid, 'A05', NULL, 'AI生成', NULL, 'MAIN', NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A05');
+
+-- A06 validate: 校验变更包
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a06', @mid, 'A06', NULL, '校验', NULL, 'MAIN', NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A06');
+
+-- A07 export: 导出脚本
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a07', @mid, 'A07', NULL, '导出脚本', NULL, 'MAIN', NULL, NULL, 7
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A07');
+
+-- A09 confirm: 确认变更项
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a09', @mid, 'A09', NULL, '确认', NULL, 'MAIN', NULL, NULL, 9
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A09');
+
+-- A10 reject: 拒绝变更项
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a10', @mid, 'A10', NULL, '拒绝', NULL, 'MAIN', NULL, NULL, 10
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A10');
+
+-- A11 unconfirm: 撤销确认
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a11', @mid, 'A11', NULL, '撤销确认', NULL, 'MAIN', NULL, NULL, 11
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A11');
+
+-- A12 getScript: 获取已确认脚本
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a12', @mid, 'A12', NULL, '获取脚本', NULL, 'MAIN', NULL, NULL, 12
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A12');
+
+-- A13 archive: 归档会话
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidev_a13', @mid, 'A13', NULL, '归档', NULL, 'MAIN', NULL, NULL, 13
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid AND APICODE='A13');
+
+-- ============================================================
+-- RS_MAIDEVUPG 的 A05-A08 自定义接口同样补配
+-- ============================================================
+SET @mid2 = (SELECT ID FROM tss_moudle WHERE MODULECODE='RS_MAIDEVUPG');
+
+-- A05 import: 导入脚本
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidevupg_a05', @mid2, 'A05', NULL, '导入脚本', NULL, 'MAIN', NULL, NULL, 5
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid2 AND APICODE='A05');
+
+-- A06 execute: 执行升级
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidevupg_a06', @mid2, 'A06', NULL, '执行升级', NULL, 'MAIN', NULL, NULL, 6
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid2 AND APICODE='A06');
+
+-- A07 rollback: 回滚
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidevupg_a07', @mid2, 'A07', NULL, '回滚', NULL, 'MAIN', NULL, NULL, 7
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid2 AND APICODE='A07');
+
+-- A08 preview: 预览
+INSERT INTO tss_moudleapi (ID, MODULEID, APICODE, APITYPE, APINAME, ACTIONCODE, PATHNAME, FILTERCODE, APIPARAM, ENTRYNUM)
+SELECT 'ma_maidevupg_a08', @mid2, 'A08', NULL, '预览', NULL, 'MAIN', NULL, NULL, 8
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_moudleapi WHERE MODULEID=@mid2 AND APICODE='A08');

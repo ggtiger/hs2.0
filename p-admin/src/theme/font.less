@@ -1,0 +1,15 @@
+@import '~heyui/themes/index.less';
+@import '~heyui/themes/var.less';
+
+@0px: 0px;
+@sizes: 12, 14, 16, 18, 20, 21, 24, 29, 32, 34, 48, 56;
+.size-loop(@list,@i:1,@val:extract(@list,@i)) when (length(@list)>=@i) {
+  .rr-f@{val} {
+    font-size: @val + @0px !important;
+  }
+  .size-loop(@list, (@i+1));
+}
+.size-loop(@sizes);
+.rr-weight {
+  font-weight: bold;
+}

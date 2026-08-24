@@ -1,0 +1,84 @@
+# =============================================================================
+# 本地构建版 Docker Compose
+# 先运行 ./build-local.sh，再启动
+# =============================================================================
+
+services:
+  mysql:
+    image: mysql:8.0
+    platform: linux/amd64
+    container_name: realso-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-d0001}
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      args:
+        APP: auth
+    platform: linux/amd64
+    image: realso-auth:latest
+    container_name: realso-auth
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://0.0.0.0:5000"
+      ConnectionStrings__D0001: "Server=mysql;Database=${MYSQL_DATABASE:-d0001};User=root;Password=${MYSQL_ROOT_PASSWORD:-rootpassword};Port=3306;Charset=utf8mb4"
+    ports:
+      - "${AUTH_PORT:-6000}:5000"
+    volumes:
+      - upload_data:/app/upload
+      - log_data:/app/log
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      args:
+        APP: webapi
+    platform: linux/amd64
+    image: realso-webapi:latest
+    container_name: realso-webapi
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_PORT: "5001"
+      Auth__Authority: "http://auth:5000"
+      Upload__ROOT: "/app/upload/"
+      ConnectionStrings__D0001: "Server=mysql;Database=${MYSQL_DATABASE:-d0001};User=root;Password=${MYSQL_ROOT_PASSWORD:-rootpassword};Port=3306;Charset=utf8mb4"
+    ports:
+      - "${WEBAPI_PORT:-7001}:5001"
+    volumes:
+      - upload_data:/app/upload
+      - log_data:/app/log
+    depends_on:
+      mysql:
+        condition: service_healthy
+      auth:
+        condition: service_started
+
+volumes:
+  mysql_data:
+  upload_data:
+  log_data:
