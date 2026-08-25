@@ -3,8 +3,8 @@
     <Layout :siderFixed="siderFixed" :siderCollapsed="siderCollapsed">
       <Sider theme="dark" class="rr-scroll-bar sider-wrapper">
         <div class="layout-logo">
-          <img v-if="siderCollapsed" src="@/assets/logo_small-1.png" />
-          <img v-else src="@/assets/logo-1.png" />
+          <img v-if="siderCollapsed" src="@/assets/logo_small-1.png" style="height: 50px;"/>
+          <img v-else src="@/assets/logo-1.png" style="height: 50px;"/>
         </div>
         <Menu
           class="h-menu-dark"
