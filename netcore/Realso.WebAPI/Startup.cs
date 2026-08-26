@@ -51,6 +51,10 @@ namespace Realso.WebAPI
                   return System.Threading.Tasks.Task.CompletedTask;
                 }
               };
+              // 令牌由 Auth 服务内部以 http://localhost:5000 请求签发，
+              // 其 iss 固定为 http://localhost:5000，与 Authority(auth:5000) 的
+              // discovery 文档 issuer 不一致，需显式指定校验的 issuer
+              options.TokenValidationParameters.ValidIssuer = Configuration["Auth:Issuer"] ?? "http://localhost:5000";
             });
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
       // Add framework services.

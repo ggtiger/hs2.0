@@ -47,7 +47,39 @@ namespace Realso.Auth
         // add custom binder to beginning of collection
         options.ModelBinderProviders.Insert(0, new HashtableBinderProvider());
       }); ;
+      // 使用持久化签名密钥（防止重启导致已签发 token 失效、webapi 校验签名失败）
+      // 密钥文件由宿主机挂载：/opt/realso/auth-signing-key.json -> /app/signing-key.json
       var rsa = RSA.Create(2048);
+      string signingKeyPath = Configuration["Auth:SigningKeyFile"] ?? "/app/signing-key.json";
+      try
+      {
+        if (System.IO.File.Exists(signingKeyPath))
+        {
+          var keyParams = Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, string>>(
+            System.IO.File.ReadAllText(signingKeyPath));
+          var rsaParams = new RSAParameters
+          {
+            Modulus = Convert.FromBase64String(keyParams["Modulus"]),
+            Exponent = Convert.FromBase64String(keyParams["Exponent"]),
+            D = Convert.FromBase64String(keyParams["D"]),
+            P = Convert.FromBase64String(keyParams["P"]),
+            Q = Convert.FromBase64String(keyParams["Q"]),
+            DP = Convert.FromBase64String(keyParams["DP"]),
+            DQ = Convert.FromBase64String(keyParams["DQ"]),
+            InverseQ = Convert.FromBase64String(keyParams["InverseQ"])
+          };
+          rsa.ImportParameters(rsaParams);
+          Console.WriteLine("签名密钥已从 " + signingKeyPath + " 加载");
+        }
+        else
+        {
+          Console.WriteLine("警告: 未找到签名密钥文件 " + signingKeyPath + "，使用临时随机密钥（重启后 token 将失效）");
+        }
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine("签名密钥加载失败，使用临时随机密钥: " + ex.Message);
+      }
       services.AddIdentityServer()
       .AddSigningCredential(new RsaSecurityKey(rsa))
       .AddInMemoryIdentityResources(Config.GetIdentityResources())

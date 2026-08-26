@@ -26,6 +26,8 @@ services:
       --character-set-server=utf8mb4
       --collation-server=utf8mb4_unicode_ci
       --default-authentication-plugin=mysql_native_password
+      --lower_case_table_names=1
+      --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
       interval: 10s
@@ -44,8 +46,9 @@ services:
     expose:
       - "5000"
     volumes:
-      - upload_data:/app/upload
-      - log_data:/app/log
+      - /opt/realso/upload:/app/upload
+      - /opt/realso/log:/app/log
+      - /opt/realso/auth-signing-key.json:/app/signing-key.json
     depends_on:
       mysql:
         condition: service_healthy
@@ -59,13 +62,14 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_PORT: "5001"
       Auth__Authority: "http://auth:5000"
+      Auth__Issuer: "http://localhost:5000"
       Upload__ROOT: "/app/upload/"
       ConnectionStrings__D0001: "Server=mysql;Database=${MYSQL_DATABASE:-d0001};User=root;Password=${MYSQL_ROOT_PASSWORD:-rootpassword};Port=3306;Charset=utf8mb4"
     expose:
       - "5001"
     volumes:
-      - upload_data:/app/upload
-      - log_data:/app/log
+      - /opt/realso/upload:/app/upload
+      - /opt/realso/log:/app/log
     depends_on:
       mysql:
         condition: service_healthy
@@ -86,5 +90,3 @@ services:
 # ---- Volumes ---------------------------------------------------------------
 volumes:
   mysql_data:
-  upload_data:
-  log_data:

@@ -113,7 +113,7 @@
   </div>
 </template>
 <script>
-import addXm from './addXm';
+import addXm from './addXM';
 export default {
   name: 'neirong',
   props: {
