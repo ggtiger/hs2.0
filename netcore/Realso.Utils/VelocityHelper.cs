@@ -86,9 +86,12 @@ namespace Realso.Utils
 
         private void setContent(Hashtable param)
         {
-            this.context = null;
+            // 必须先建空 context：param 为空时 context 为 null 会导致 NVelocity Evaluate 抛 NRE
+            this.context = new VelocityContext();
+            if (param == null) return;
             foreach (string key in param.Keys) {
-                this.Put(key, param[key]);
+                // null 值转为空串：NVelocity 引用到 null 值变量会抛 NRE
+                this.Put(key, param[key] ?? "");
             }
         }
 

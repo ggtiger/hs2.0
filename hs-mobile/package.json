@@ -1,7 +1,7 @@
 {
   "name": "hs-mobile",
   "version": "1.0.0",
-  "description": "华溯计量管理系统 - 移动端 (uni-app + Vue3)",
+  "description": "睿谱希管理系统 - 移动端 (uni-app + Vue3)",
   "private": true,
   "scripts": {
     "dev:h5": "uni",

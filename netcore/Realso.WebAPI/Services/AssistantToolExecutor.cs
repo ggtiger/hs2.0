@@ -741,10 +741,22 @@ namespace Realso.WebAPI.Services
           "SELECT FUNCNAME, OUTERURL FROM tss_func WHERE FUNCCODE=@mc AND ISHIDE=0 LIMIT 1", new { mc = moduleCode });
         if (row == null || string.IsNullOrEmpty((string)row.OUTERURL))
           return new NavigateResult { navigated = false, error = "模块 " + moduleCode + " 无菜单入口，无法跳转" };
+        // 与菜单 select() 跳转规则一致：g/ 或 /g/ 开头视为完整路径（通用模块，仅补前导斜杠），
+        // 否则视为本地页面路由名（如 b01/m05），补 /main 列表页
+        string outerUrl = ((string)row.OUTERURL).Trim();
+        string path;
+        if (outerUrl.StartsWith("g/") || outerUrl.StartsWith("/g/"))
+        {
+          path = outerUrl.StartsWith("/") ? outerUrl : "/" + outerUrl;
+        }
+        else
+        {
+          path = "/" + outerUrl.TrimStart('/') + "/main";
+        }
         return new NavigateResult
         {
           navigated = true,
-          path = "/" + (string)row.OUTERURL + "/main",
+          path = path,
           id = id,
           moduleCode = moduleCode,
           moduleName = (string)row.FUNCNAME
@@ -866,7 +878,8 @@ namespace Realso.WebAPI.Services
       }
       catch (System.Exception ex)
       {
-        return new { error = "构建 base 查询失败: " + ex.Message };
+        Realso.Utils.Logger.Error("[query_stats] 构建 base 查询失败: " + ex.Message + "\n" + ex.StackTrace);
+        return new { error = "构建 base 查询失败: " + ex.Message, resourceId, filterCode, stack = ex.StackTrace };
       }
 
       // 包成子查询做聚合
@@ -896,14 +909,16 @@ namespace Realso.WebAPI.Services
           var rows = helper.Query<dynamic>(full, paramDict);
           var list = new List<object>();
           foreach (var rr in rows) list.Add(rr);
-          return new { count = list.Count, rows = list };
+          return new { count = list.Count, rows = list, sql = full };
         }
       }
       catch (System.Exception ex)
       {
+        Realso.Utils.Logger.Error("[query_stats] SQL 执行失败: " + ex.Message + "\nSQL: " + full + "\n" + ex.StackTrace);
         return new
         {
           error = "SQL 执行失败: " + ex.Message,
+          sql = full,
           availableFields = fieldNames,
           hint = "select/groupBy 里引用的字段名必须来自 availableFields（这是 ORM 子查询输出的列名）。"
         };

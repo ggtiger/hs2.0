@@ -284,7 +284,7 @@ export { STORE_NAME, MODULE_CODE, getStore };
 const configJs = `/**
  * SFC 测试模块 - 配置常量
  */
-export const APP_NAME = "华溯计量管理系统";
+export const APP_NAME = "睿谱希管理系统";
 export const VERSION = "2.0.0";
 
 export const STATUS_MAP = {

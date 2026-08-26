@@ -36,6 +36,21 @@ namespace Realso.WebAPI
               options.RequireHttpsMetadata = false;
               options.Audience = "api1";
               options.TokenValidationParameters.ClockSkew = TimeSpan.FromSeconds(10);
+              // SignalR WebSocket 无法设置请求头，从 query string access_token 取 token
+              options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+              {
+                OnMessageReceived = context =>
+                {
+                  var accessToken = context.Request.Query["access_token"];
+                  var path = context.HttpContext.Request.Path;
+                  if (!string.IsNullOrEmpty(accessToken) &&
+                      (path.StartsWithSegments("/assistantHub") || path.StartsWithSegments("/chatHub")))
+                  {
+                    context.Token = accessToken;
+                  }
+                  return System.Threading.Tasks.Task.CompletedTask;
+                }
+              };
             });
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
       // Add framework services.

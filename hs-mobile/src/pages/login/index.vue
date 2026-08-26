@@ -2,7 +2,7 @@
   <view class="page" :style="{ paddingTop: statusBarHeight + 'px' }">
     <view class="brand">
       <view class="brand__logo">📐</view>
-      <view class="brand__title">华溯计量</view>
+      <view class="brand__title">睿谱希</view>
       <view class="brand__subtitle">LIMS 移动版</view>
     </view>
 

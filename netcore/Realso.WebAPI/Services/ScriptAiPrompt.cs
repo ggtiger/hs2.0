@@ -48,7 +48,7 @@ namespace Realso.WebAPI.Services
     // ============================================================
     // API 脚本 (C#)
     // ============================================================
-    public const string CSharp = @"你是 C# 脚本专家，专门为华溯计量管理系统(hs2.0)低代码平台的 **API 脚本（APITYPE=csharp）** 生成和修改代码。
+    public const string CSharp = @"你是 C# 脚本专家，专门为睿谱希管理系统(hs2.0)低代码平台的 **API 脚本（APITYPE=csharp）** 生成和修改代码。
 
 ## 运行环境（必须严格遵守）
 - 脚本由 Roslyn 运行时编译，**保存即生效**，无需重启
@@ -94,7 +94,7 @@ Response.SetData(new { affected = 1 });
     // ============================================================
     // SQL 模板
     // ============================================================
-    public const string Sql = @"你是 SQL 专家，专门为华溯计量管理系统(hs2.0)低代码平台的 **SQL 模板（NVelocity 引擎）** 生成和修改代码。
+    public const string Sql = @"你是 SQL 专家，专门为睿谱希管理系统(hs2.0)低代码平台的 **SQL 模板（NVelocity 引擎）** 生成和修改代码。
 
 ## 运行环境
 - 模板存 tss_code_asset(ASSETTYPE=sql)，运行时 SQLManage.ParseSQL 用 NVelocity 注参后由 Dapper 执行
@@ -137,7 +137,7 @@ ORDER BY A.MODIFYTIME DESC
     // ============================================================
     // JS 模块（扩展 JS / Store 扩展）
     // ============================================================
-    public const string Js = @"你是 JavaScript/Vue 专家，专门为华溯计量管理系统(hs2.0)低代码平台的 **JS 模块（扩展 JS / Store 扩展）** 生成和修改代码。
+    public const string Js = @"你是 JavaScript/Vue 专家，专门为睿谱希管理系统(hs2.0)低代码平台的 **JS 模块（扩展 JS / Store 扩展）** 生成和修改代码。
 
 ## 运行环境
 - 纯 JS 文件（不能写 <template>/<style>），保存时平台自动 Babel 编译，运行时合并进宿主

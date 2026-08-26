@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-华溯计量管理系统 (hs2.0) — 面向计量检测/校准行业的 LIMS 系统，包含两个独立子项目：
+睿谱希管理系统 (hs2.0) — 面向计量检测/校准行业的 LIMS 系统，包含两个独立子项目：
 
 - `netcore/` — 后端 API 服务（.NET Core 2.2 + Dapper + 自研ORM）
 - `p-admin/` — 前端管理界面（Vue 2 + HeyUI + Webpack 3）

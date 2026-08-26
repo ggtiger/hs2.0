@@ -1,7 +1,7 @@
 {
-  "name": "华溯计量",
+  "name": "睿谱希",
   "appid": "__UNI__HSMOBILE",
-  "description": "华溯计量管理系统移动端",
+  "description": "睿谱希管理系统移动端",
   "versionName": "1.0.0",
   "versionCode": "100",
   "transformPx": false,
@@ -51,7 +51,7 @@
       "mode": "hash",
       "base": "./"
     },
-    "title": "华溯计量",
+    "title": "睿谱希",
     "template": "index.html"
   },
   "vueVersion": "3"

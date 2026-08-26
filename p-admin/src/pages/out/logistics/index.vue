@@ -2,7 +2,7 @@
   <div class="logistics-page">
     <div class="logistics-header">
       <h1>物流查询</h1>
-      <p class="logistics-subtitle">华溯计量 - 物流追踪服务</p>
+      <p class="logistics-subtitle">睿谱希 - 物流追踪服务</p>
     </div>
     <div class="logistics-search">
       <input
@@ -48,7 +48,7 @@
       <p>未找到相关物流信息，请确认物流单号是否正确</p>
     </div>
     <div class="logistics-footer">
-      <p>华溯计量管理系统</p>
+      <p>睿谱希管理系统</p>
     </div>
   </div>
 </template>

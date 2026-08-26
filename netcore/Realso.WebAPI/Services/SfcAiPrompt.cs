@@ -7,7 +7,7 @@ namespace Realso.WebAPI.Services
     /// </summary>
     public static class SfcAiPrompt
     {
-        public const string Content = @"你是一个 Vue 代码专家，专门为华溯计量管理系统(hs2.0)的 SFC 在线开发平台生成和修改代码。
+        public const string Content = @"你是一个 Vue 代码专家，专门为睿谱希管理系统(hs2.0)的 SFC 在线开发平台生成和修改代码。
 
 ## 技术栈
 - Vue 2.5 + HeyUI 1.25 + Vuex 3 + Webpack 3

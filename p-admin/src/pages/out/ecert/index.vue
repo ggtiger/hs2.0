@@ -1,7 +1,7 @@
 <template>
   <div class="ecert-page">
     <div class="ecert-header">
-      <h1>华溯计量 - 电子证书验证</h1>
+      <h1>睿谱希 - 电子证书验证</h1>
       <p class="ecert-subtitle">验证证书真伪，查看电子证书</p>
     </div>
 
@@ -106,7 +106,7 @@
     </div>
 
     <div class="ecert-footer">
-      <p>华溯计量管理系统 &copy; 版权所有</p>
+      <p>睿谱希管理系统 &copy; 版权所有</p>
       <p>如有疑问请联系客服</p>
     </div>
   </div>

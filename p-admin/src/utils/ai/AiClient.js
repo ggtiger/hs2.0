@@ -31,7 +31,12 @@ let frontendToolExtraProvider = null;
 
 function build() {
   var c = new signalR.HubConnectionBuilder()
-    .withUrl(db.getUrl('url') + '/assistantHub')
+    .withUrl(db.getUrl('url') + '/assistantHub', {
+      // 后端 AssistantHub 已加 [Authorize]，JWT 通过 query string 传递
+      accessTokenFactory: function() {
+        return (store.state['user'] && store.state['user'].access_token) || '';
+      }
+    })
     .configureLogging(signalR.LogLevel.Warning)
     .build();
   c.on('block', function(b) {

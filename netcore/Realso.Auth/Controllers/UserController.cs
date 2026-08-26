@@ -25,6 +25,8 @@ using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using IdentityModel.Client;
+using Realso.Utils;
+using Realso.Data.DBAccess;
 
 namespace Realso.Auth.Controllers
 {
@@ -60,9 +62,29 @@ namespace Realso.Auth.Controllers
       USERNAME = JsonConvert.DeserializeObject<String>(USERNAME);
       PASSWORD = JsonConvert.DeserializeObject<String>(PASSWORD);
       queryInfo.FilterParams["USERNAME"] = USERNAME;
-      queryInfo.FilterParams["PASSWORD"] = PASSWORD;
       qview.Open(queryInfo);
       if (qview.GetView().Count == 0)
+      {
+        responseModel.SetData(false);
+        return this.doResponse();
+      }
+      // 密码校验：哈希存储走 VerifyPassword；存量明文兼容比对，成功后自动升级为哈希
+      string storedPwd = qview.GetValue("PASSWORD");
+      bool pwdOk;
+      if (!string.IsNullOrEmpty(storedPwd) && storedPwd.Contains("$"))
+      {
+        pwdOk = PasswordHelper.VerifyPassword(PASSWORD, storedPwd);
+      }
+      else
+      {
+        pwdOk = storedPwd == PASSWORD;
+        if (pwdOk)
+        {
+          DB.GetDBHelper().Execute("UPDATE TSS_USER SET PASSWORD=@PASSWORD WHERE ID=@ID",
+            new { PASSWORD = PasswordHelper.HashPassword(PASSWORD), ID = qview.GetValue("ID") });
+        }
+      }
+      if (!pwdOk)
       {
         responseModel.SetData(false);
         return this.doResponse();

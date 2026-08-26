@@ -1,6 +1,6 @@
-# 华溯计量 — 移动端 (hs-mobile)
+# 睿谱希 — 移动端 (hs-mobile)
 
-华溯计量管理系统（hs2.0）移动端应用，基于 **uni-app + Vue3 + Pinia + Vite**，一套代码同时输出 **微信小程序** 和 **H5**。
+睿谱希管理系统（hs2.0）移动端应用，基于 **uni-app + Vue3 + Pinia + Vite**，一套代码同时输出 **微信小程序** 和 **H5**。
 
 完整设计文档见：[../docs/mobile-design.md](../docs/mobile-design.md)
 

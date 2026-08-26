@@ -5,7 +5,7 @@ import { getUserInfo } from '@/utils/auth'
 
 export default {
   onLaunch() {
-    console.log('华溯计量 App Launch')
+    console.log('睿谱希 App Launch')
     // 先恢复 _userInfo_ 缓存（不依赖 Pinia，确保后续请求带上用户信息）
     const info = getUserInfo()
     if (info) setUserInfoCache(info)

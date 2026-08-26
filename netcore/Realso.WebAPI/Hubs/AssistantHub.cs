@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Realso.Data.DBAccess;
 using Realso.WebAPI.Services;
 using Realso.WebAPI.Services.Agent;
 
@@ -18,7 +20,9 @@ namespace Realso.WebAPI.Hubs
   /// 共用 AgentEngine.RunLoopAsync ReAct 循环（阶段 2a 重构：替代原 RunAgentLoop）。
   /// 工具层委托 IToolRegistry + IToolExecutor，前端工具委托 FrontendToolHandler。
   /// CORS 由全局 "SignalrCore" 策略处理。
+  /// [Authorize]：必须登录（JWT 经 query string access_token 传递，见 Startup JwtBearerEvents）。
   /// </summary>
+  [Authorize]
   public class AssistantHub : Hub
   {
     private readonly LlmConfigService _cfg;
@@ -170,7 +174,8 @@ namespace Realso.WebAPI.Hubs
         try
         {
           if (string.IsNullOrWhiteSpace(scene)) scene = "assistant";
-          Hashtable userInfo = ParseUserInfo(userInfoJson);
+          Hashtable userInfo = GetUserInfo(); // 从 JWT 取身份，忽略前端自报 userInfoJson
+          if (userInfo == null) { await SendBlock("block", "error", "无法识别登录用户，请重新登录"); await Clients.Caller.SendAsync("block", new { type = "done" }); return; }
           string userId = userInfo != null ? (userInfo["ID"] + "") : "anonymous";
           string userName = userInfo != null ? (userInfo["NICKNAME"] + "") : "";
 
@@ -252,7 +257,8 @@ namespace Realso.WebAPI.Hubs
     {
       using (SetCaller())
       {
-        Hashtable userInfo = ParseUserInfo(userInfoJson);
+        Hashtable userInfo = GetUserInfo(); // 从 JWT 取身份，忽略前端自报 userInfoJson
+        if (userInfo == null) { await SendBlock("block", "error", "无法识别登录用户，请重新登录"); await Clients.Caller.SendAsync("block", new { type = "done" }); return; }
         string userId = userInfo != null ? (userInfo["ID"] + "") : "anonymous";
         string userName = userInfo != null ? (userInfo["NICKNAME"] + "") : "";
 
@@ -313,7 +319,8 @@ namespace Realso.WebAPI.Hubs
     {
       using (SetCaller())
       {
-        Hashtable userInfo = ParseUserInfo(userInfoJson);
+        Hashtable userInfo = GetUserInfo(); // 从 JWT 取身份，忽略前端自报 userInfoJson
+        if (userInfo == null) { await SendBlock("formblock", "error", "无法识别登录用户，请重新登录"); await Clients.Caller.SendAsync("formblock", new { type = "done" }); return; }
         string userId = userInfo != null ? (userInfo["ID"] + "") : "anonymous";
         string userName = userInfo != null ? (userInfo["NICKNAME"] + "") : "";
 
@@ -435,10 +442,42 @@ namespace Realso.WebAPI.Hubs
       await Clients.Caller.SendAsync(eventName, new { type, text });
     }
 
-    private static Hashtable ParseUserInfo(string userInfoJson)
+    /// <summary>
+    /// 从 JWT claims(sub=USERNAME) 查询用户信息，不信任前端自报的 userInfoJson。
+    /// 返回与 VSS_USER 行一致的键：ID/USERNAME/NICKNAME/USERTYPE/EMPID/EMPCODE/EMPNAME/DEPTID。
+    /// </summary>
+    private Hashtable GetUserInfo()
     {
-      try { if (!string.IsNullOrEmpty(userInfoJson)) return JsonConvert.DeserializeObject<Hashtable>(userInfoJson); } catch { }
-      return null;
+      // .NET 2.2 JwtBearer 会把 sub 映射为 nameidentifier，三种取法兜底
+      string username = Context.User?.FindFirst("sub")?.Value
+        ?? Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+        ?? Context.User?.Identity?.Name;
+      if (string.IsNullOrEmpty(username))
+      {
+        var claims = Context.User?.Claims == null ? "(no claims)"
+          : string.Join(", ", System.Linq.Enumerable.Select(Context.User.Claims, c => c.Type + "=" + c.Value));
+        Realso.Utils.Logger.Error("[AssistantHub] 无法从 token 获取用户名, claims: " + claims);
+        return null;
+      }
+      var row = DB.GetDBHelper().QueryFirstOrDefault(
+        "SELECT U.ID, U.USERNAME, U.NICKNAME, U.USERTYPE, U.EMPID, E.EMPCODE, E.EMPNAME, E.DEPTID" +
+        " FROM TSS_USER U LEFT JOIN TBS_EMP E ON U.EMPID = E.ID WHERE U.USERNAME = @USERNAME",
+        new { USERNAME = username });
+      if (row == null)
+      {
+        Realso.Utils.Logger.Error("[AssistantHub] TSS_USER 查不到用户: " + username);
+        return null;
+      }
+      Hashtable ht = new Hashtable();
+      ht["ID"] = row.ID;
+      ht["USERNAME"] = row.USERNAME;
+      ht["NICKNAME"] = row.NICKNAME;
+      ht["USERTYPE"] = row.USERTYPE;
+      ht["EMPID"] = row.EMPID;
+      ht["EMPCODE"] = row.EMPCODE;
+      ht["EMPNAME"] = row.EMPNAME;
+      ht["DEPTID"] = row.DEPTID;
+      return ht;
     }
 
     /// <summary>解析 formDataJson 生成"当前表单已有数据"提示</summary>

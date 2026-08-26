@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 华溯计量管理系统 11 项升级需求全部实施，包括 UI 重构、审核分屏、异常检测、电子证书、物流管理等。
+**Goal:** 睿谱希管理系统 11 项升级需求全部实施，包括 UI 重构、审核分屏、异常检测、电子证书、物流管理等。
 
 **Architecture:** 在现有 Vue 2 + HeyUI + Webpack 3 前端和 .NET Core 2.2 + Dapper + 自研ORM 后端上改造。遵循现有元数据驱动架构和模块化页面结构（router.js + store.js + views/）。新增功能通过 DataController.doMyApi 扩展点和标准 CRUD 模式实现。
 
@@ -1103,7 +1103,7 @@ git commit -m "feat: 后端增加电子证书签发API，支持公章合成和�
 <template>
   <div class="ecert-page">
     <div class="ecert-header">
-      <h2>华溯计量 - 电子证书验证</h2>
+      <h2>睿谱希 - 电子证书验证</h2>
     </div>
     <div class="ecert-body" v-if="certInfo">
       <div class="ecert-valid" v-if="certInfo.isValid">

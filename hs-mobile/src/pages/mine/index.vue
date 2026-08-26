@@ -129,8 +129,8 @@ function changePwd() {
 }
 function showAbout() {
   uni.showModal({
-    title: '华溯计量',
-    content: '华溯计量管理系统移动端\n版本 v' + version.value + '\n© 2026',
+    title: '睿谱希',
+    content: '睿谱希管理系统移动端\n版本 v' + version.value + '\n© 2026',
     showCancel: false
   })
 }

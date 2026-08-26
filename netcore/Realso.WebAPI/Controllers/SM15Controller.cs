@@ -44,7 +44,7 @@ namespace Realso.WebAPI.Controllers
     {
       M01 m01 = new M01(this.operate01, "VSS_USER");
       m01.OpenByID(Params["ID"] + "");
-      m01.SetValue("PASSWORD", "888888");
+      m01.SetValue("PASSWORD", PasswordHelper.HashPassword("888888"));
       ArrayList saveList = new ArrayList();
       saveList.Add(m01.GetView());
       this.Save(MD.GetView()[0].GetString("MODULENAME"), row.GetString("APINAME"), saveList);
@@ -57,15 +57,24 @@ namespace Realso.WebAPI.Controllers
       QueryInfo queryInfo = new QueryInfo();
       queryInfo.FilterCode = "F02";
       queryInfo.FilterParams["USERNAME"] = Params["USERNAME"];
-      queryInfo.FilterParams["PASSWORD"] = Params["OPASSWORD"];
       m01.Open(queryInfo);
-      if (m01.GetView().Count == 0)
+      bool pwdOk = false;
+      if (m01.GetView().Count > 0)
+      {
+        // 哈希存储走 VerifyPassword；存量明文兼容比对
+        string stored = m01.GetValue("PASSWORD");
+        string opwd = Params["OPASSWORD"] + "";
+        pwdOk = !string.IsNullOrEmpty(stored) && stored.Contains("$")
+          ? PasswordHelper.VerifyPassword(opwd, stored)
+          : stored == opwd;
+      }
+      if (!pwdOk)
       {
         responseModel.SetError("原密码不正确!");
       }
       else
       {
-        m01.SetValue("PASSWORD", Params["PASSWORD"] + "");
+        m01.SetValue("PASSWORD", PasswordHelper.HashPassword(Params["PASSWORD"] + ""));
         ArrayList saveList = new ArrayList();
         saveList.Add(m01.GetView());
         this.Save(MD.GetView()[0].GetString("MODULENAME"), row.GetString("APINAME"), saveList);

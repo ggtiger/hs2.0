@@ -29,7 +29,7 @@ FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_ai_memory WHERE ID='am_gloss_key_i
 INSERT INTO tss_ai_memory (ID, MEMORYTYPE, ASSETTYPE, TITLE, CONTENT, TAGS, SCENE_CODES, WIZARD_STEPS, PRIORITY, SOURCE, ISDELETED, CREATETIME)
 SELECT 'am_gloss_business_objects', 'glossary', 'general',
 '业务对象(计量检测行业)',
-'ORECORD=检测记录(主业务对象, 表 tck_orecord); ACCEPT=受理; CERT=证书; CUST=客户(tbs_cust, CUSTCODE/CUSTNAME); EMP=员工(tbs_emp, EMPNAME); DEPT=部门(tbs_dept); REGUITEM=检定项目(tbs_reguitem, ITEMNAME); LOGISTICS=物流(tss_logistics); PROJECT_FEE=项目费用(tss_project_fee); CALIBRATION_RULES=校准规则(tbs_calibration_rules)。华溯计量管理系统面向计量检测/校准行业 LIMS。',
+'ORECORD=检测记录(主业务对象, 表 tck_orecord); ACCEPT=受理; CERT=证书; CUST=客户(tbs_cust, CUSTCODE/CUSTNAME); EMP=员工(tbs_emp, EMPNAME); DEPT=部门(tbs_dept); REGUITEM=检定项目(tbs_reguitem, ITEMNAME); LOGISTICS=物流(tss_logistics); PROJECT_FEE=项目费用(tss_project_fee); CALIBRATION_RULES=校准规则(tbs_calibration_rules)。睿谱希管理系统面向计量检测/校准行业 LIMS。',
 '业务对象,ORECORD,ACCEPT,CERT,计量,LIMS',
 NULL, NULL, 3, 'auto_seed', 0, NOW()
 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM tss_ai_memory WHERE ID='am_gloss_business_objects');
