@@ -30,7 +30,8 @@ function getStoreResult() {
       async loadAcceptRefs(ctx, { id }) {
         return db.postData({
           api: '/api/data/call/R02_M07/A02/',
-          params: { ID: id },
+          // 后端 doOpen 从 FilterParams 取 ID，平铺格式会导致 500
+          params: { FilterParams: { ID: id } },
         });
       },
     }
