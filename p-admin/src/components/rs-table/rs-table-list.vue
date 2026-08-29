@@ -108,6 +108,16 @@ export default {
     },
   },
   methods: {
+    // 代理内部 HeyUI Table 的选区方法（弹窗组件如 tmpSel/ardSel 通过 $refs.selection 调用）
+    getSelection() {
+      return this.$refs.table ? this.$refs.table.getSelection() : [];
+    },
+    setSelection(rows) {
+      if (this.$refs.table) this.$refs.table.setSelection(rows);
+    },
+    setRowSelect(row, value) {
+      if (this.$refs.table) this.$refs.table.setRowSelect(row, value);
+    },
     // 按钮显隐：未配 visibleIf 时默认 ISSHOW+按钮 code；method 传入 { key, path }
     isActionVisible(act) {
       if (!this.visibilityHost) return true;

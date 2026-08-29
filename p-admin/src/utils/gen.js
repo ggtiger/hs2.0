@@ -297,6 +297,13 @@ export default {
             props.cellProps = { option, keyName: option.keyName, titleName: option.titleName };
           }
         }
+        // fileuploadtpl：文件上传+模板选择，SELECTDATA 存 {"templateType":"","moduleCode":"","showSelect":true}
+        if (titem['type'] === 'fileuploadtpl') {
+          let tplCfg = {};
+          try { tplCfg = JSON.parse(item['SELECTDATA']) || {}; } catch (e) {}
+          props.cellProps = props.cellProps || {};
+          props.cellProps.uploaderTplConfig = tplCfg;
+        }
         props.formItemProps= {required: +item['NULLABLE']!==1,prop: titem['key'],label:item['LABELNAME']};
         if (titem['type'] === 'action') {
           let { ACTIONCODE } = item;

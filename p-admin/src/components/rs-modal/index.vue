@@ -70,6 +70,10 @@ export default {
     hide() {
       this.modal = false;
     },
+    // 兼容旧弹窗组件调用 $parent.setvalue(false) 关闭弹窗（如 r01/m02 的 tmpSel/ardSel）
+    setvalue(v) {
+      this.modal = !!v;
+    },
   },
 };
 </script>

@@ -37,6 +37,21 @@
         <a v-if="currentValue" class="link" :href="fileDownloadUrl" target="_blank">{{ fileDisplayName }}</a>
       </label>
     </div>
+    <div v-else-if="type == 'fileuploadtpl'">
+      <!-- 编辑态：上传 + 选入模版；非编辑态：只显示附件名称链接 -->
+      <label v-if="canEdit" style="width: 100%">
+        <RsUploaderTemplate
+          style="width: 100%"
+          :template-type="((cellProps||{}).uploaderTplConfig||{}).templateType || ''"
+          :module-code="((cellProps||{}).uploaderTplConfig||{}).moduleCode || ''"
+          :show-select="((cellProps||{}).uploaderTplConfig||{}).showSelect !== false"
+          v-model="fileValue"
+        ></RsUploaderTemplate>
+      </label>
+      <label v-else>
+        <a v-if="currentValue" class="link" :href="fileDownloadUrl" target="_blank">{{ tplFileName || fileDisplayName }}</a>
+      </label>
+    </div>
     <div v-else-if="type == 'number'">
       <label v-if="canEdit" style="width: 100%">
         <input type="number" style="width: 100%" v-model="currentValue" @blur="applyEdit" />
@@ -99,9 +114,29 @@
 </template>
 <script>
 import RsUploader from '@/components/rs-uploader';
+import RsUploaderTemplate from '@/components/rs-uploader-template';
 import RsCodeEditor from '@/components/rs-code-editor';
 import heyui from 'heyui';
 import { getUrl } from '@/api/urls';
+import { httpGet } from '@/components/rs-onlyoffice-shared';
+
+// Word 模版文件名缓存（FILEID → 模板名），非编辑态显示用
+const tplNameCache = {};
+let tplNamesLoading = false;
+const tplNameWaiters = [];
+function loadTplNames(vm) {
+  if (tplNamesLoading) {
+    return new Promise(resolve => tplNameWaiters.push(resolve));
+  }
+  tplNamesLoading = true;
+  const token = (vm.$store && vm.$store.state['user'] && vm.$store.state['user'].access_token) || '';
+  return httpGet(getUrl('url') + '/api/word-template/list', token).then(r => {
+    (r.data || []).forEach(it => { tplNameCache[it.FILEID] = it.TEMPLATENAME || it.FILENAME || ''; });
+  }).catch(() => {}).then(() => {
+    tplNamesLoading = false;
+    tplNameWaiters.splice(0).forEach(cb => cb());
+  });
+}
 export default {
   name: 'rs-table-cell',
   props: {
@@ -125,9 +160,10 @@ export default {
       selectValue: {},
       updateItem: null,
       codeEditorVisible: false,
+      tplFileName: '',
     };
   },
-  components: { RsUploader, RsCodeEditor },
+  components: { RsUploader, RsCodeEditor, RsUploaderTemplate },
   computed: {
     canEdit() {
       return this.editInfo.editIndex === this.$parent.index && this.edit && this.editInfo.edit;
@@ -290,10 +326,24 @@ export default {
     // value prop变化时同步到currentValue（AI填报$set row后，:value="data[column.key]"传新值，需同步显示）
     value(v) {
       this.currentValue = v;
+      this.tryLoadTplName(v);
     },
   },
-  mounted() {},
+  mounted() {
+    this.tryLoadTplName(this.currentValue);
+  },
   methods: {
+    // fileuploadtpl 非编辑态显示：按 FILEID 反查 Word 模板名（模块级缓存）
+    tryLoadTplName(id) {
+      if (this.type !== 'fileuploadtpl' || !id) return;
+      if (tplNameCache[id] !== undefined) {
+        this.tplFileName = tplNameCache[id];
+        return;
+      }
+      loadTplNames(this).then(() => {
+        this.tplFileName = tplNameCache[id] || '';
+      });
+    },
     getFileValue() {
       return this.fileValue;
     },

@@ -11,7 +11,7 @@
           </Col>
         </Row>
         <div class="rs-flex-1 rr-overflow-hidden">
-          <rs-table-list :datas="PTMP" :path="$PTMP" border checkbox class ref="selection"></rs-table-list>
+          <rs-table-list :datas="PTMP" :path="$PTMP" border checkbox class ref="selection" @select="onCheckSelect" @trclick="onRowClick"></rs-table-list>
         </div>
       </Form>
       <div class="rs-modal-footer rs-text-right" slot="footer">
@@ -47,7 +47,18 @@ export default {
           DEPTID: this.item.ADEPTID || -1,
         },
         isBusy: false });
-      if (this.PTMP) this.$refs.selection.$refs.table.setRowSelect(this.PTMP[0]);
+      // setRowSelect 只是高亮不会勾选 checkbox，getSelection 只取勾选行，必须用 setSelection
+      if (this.PTMP && this.PTMP[0]) this.$refs.selection.setSelection([this.PTMP[0]]);
+    },
+    // 单选效果：勾选新行时自动取消其它行，保证 getSelection 只有一行
+    onCheckSelect(rows) {
+      if (rows && rows.length > 1) {
+        this.$refs.selection.setSelection([rows[rows.length - 1]]);
+      }
+    },
+    // 点行即选中该行（单选）
+    onRowClick(data) {
+      this.$refs.selection.setSelection([data]);
     },
     close() {
       this.$parent.setvalue(false);

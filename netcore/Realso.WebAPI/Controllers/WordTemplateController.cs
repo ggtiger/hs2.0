@@ -2674,6 +2674,99 @@ window._WORD_TEMPLATE_DOC_KEY_ = " + docKeyJs + @";
 
     #endregion
 
+    #region 模版复制
+
+    /// <summary>
+    /// 复制 Word 模版定义（模版记录与模版文件均生成独立副本）
+    /// POST /api/word-template/copy/{templateId}
+    /// </summary>
+    [HttpPost("copy/{templateId}")]
+    [EnableCors("AllowHeaders")]
+    public IActionResult CopyTemplate(string templateId)
+    {
+      try
+      {
+        // 1. 查询模版记录
+        DBHelper helper = DB.GetDBHelper();
+        using (helper)
+        {
+          var tpl = helper.QueryFirstOrDefault(
+            "SELECT ID, TEMPLATENAME, TEMPLATETYPE, MODULECODE, TEMPLATEID, FILEID, FILENAME, FIELDBINDINGS, REMARK, ISUSE " +
+            "FROM tbs_word_template WHERE ID=@ID AND ISDELETED=0 LIMIT 1",
+            new { ID = templateId });
+          if (tpl == null)
+          {
+            return NotFound(new { success = false, Message = "模版不存在" });
+          }
+          string srcFileId = tpl.FILEID + "";
+          if (string.IsNullOrEmpty(srcFileId))
+          {
+            return Ok(new { success = false, Message = "该模版未上传文件，无法复制" });
+          }
+
+          // 2. 查询源文件记录
+          var srcFile = helper.QueryFirstOrDefault(
+            "SELECT ID, FILENAME, FILEPATH, FILESIZE FROM tss_files WHERE ID=@ID LIMIT 1",
+            new { ID = srcFileId });
+          if (srcFile == null)
+          {
+            return Ok(new { success = false, Message = "模版文件记录不存在" });
+          }
+          string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
+          string srcPath = rootPath + (srcFile.FILEPATH + "");
+          if (!System.IO.File.Exists(srcPath))
+          {
+            return Ok(new { success = false, Message = "模版文件不存在于磁盘" });
+          }
+
+          // 3. 复制物理文件到同目录，文件名加时间戳避免冲突
+          string srcDir = Path.GetDirectoryName(srcPath);
+          string srcExt = Path.GetExtension(srcPath);
+          string srcNameNoExt = Path.GetFileNameWithoutExtension(srcPath);
+          string copyNameNoExt = srcNameNoExt + "_copy_" + DateTime.Now.ToString("yyyyMMddHHmmss");
+          string copyFileName = copyNameNoExt + srcExt;
+          string copyPath = Path.Combine(srcDir, copyFileName);
+          System.IO.File.Copy(srcPath, copyPath, false);
+
+          // 4. 写入 tss_files 文件记录
+          string newFileId = Guid.NewGuid().ToString("N");
+          string copyRelativePath = (srcFile.FILEPATH + "").Replace(Path.GetFileName(srcFile.FILEPATH + ""), copyFileName);
+          helper.Execute(
+            "INSERT INTO tss_files (ID, FILENAME, FILEPATH, FILESIZE, CREATEDATE) VALUES (@ID, @NAME, @PATH, @SIZE, NOW())",
+            new { ID = newFileId, NAME = copyFileName, PATH = copyRelativePath, SIZE = new System.IO.FileInfo(copyPath).Length });
+
+          // 5. 写入 tbs_word_template 模版记录（名称追加"副本"）
+          string newTplId = Guid.NewGuid().ToString("N");
+          string newTplName = (tpl.TEMPLATENAME + "") + "（副本）";
+          helper.Execute(
+            "INSERT INTO tbs_word_template (ID, TEMPLATENAME, TEMPLATETYPE, MODULECODE, TEMPLATEID, FILEID, FILENAME, FIELDBINDINGS, REMARK, ISUSE, ISDELETED, CREATEDATE) " +
+            "VALUES (@ID, @NAME, @TYPE, @MODULECODE, @TEMPLATEID, @FILEID, @FILENAME, @FIELDBINDINGS, @REMARK, @ISUSE, 0, NOW())",
+            new
+            {
+              ID = newTplId,
+              NAME = newTplName,
+              TYPE = tpl.TEMPLATETYPE + "",
+              MODULECODE = tpl.MODULECODE + "",
+              TEMPLATEID = tpl.TEMPLATEID + "",
+              FILEID = newFileId,
+              FILENAME = copyFileName,
+              FIELDBINDINGS = tpl.FIELDBINDINGS == null ? "" : (tpl.FIELDBINDINGS + ""),
+              REMARK = tpl.REMARK + "",
+              ISUSE = Convert.ToInt32(tpl.ISUSE)
+            });
+
+          return Ok(new { success = true, ID = newTplId, FILEID = newFileId });
+        }
+      }
+      catch (Exception ex)
+      {
+        Logger.Info("WordTemplate CopyTemplate 异常: " + ex.Message + "\n" + ex.StackTrace);
+        return StatusCode(500, new { success = false, Message = "复制失败: " + ex.Message });
+      }
+    }
+
+    #endregion
+
     #region 数据模型
 
     public class FieldDefinition

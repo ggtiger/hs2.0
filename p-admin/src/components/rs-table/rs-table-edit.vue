@@ -199,7 +199,7 @@ export default {
       this.$emit('data-change', { path: this.path.scm, item, index });
     },
     _editColumn(type) {
-      return ['text', 'select', 'number', 'autocomplete', 'textarea', 'checkbox', 'file', 'fileupload', 'imageupload', 'datepicker', 'code'].indexOf(type) !== -1;
+      return ['text', 'select', 'number', 'autocomplete', 'textarea', 'checkbox', 'file', 'fileupload', 'imageupload', 'fileuploadtpl', 'datepicker', 'code'].indexOf(type) !== -1;
     },
     setColumns(columns) {
       let { editInfo, getProps } = this;

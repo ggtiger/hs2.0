@@ -329,7 +329,8 @@ export default {
 @import '~@/theme/index.less';
 .layout-demo-3-vue {
   .h-layout {
-    background: #F0F2F5;
+    // 透明，透出 body 的浅绿渐变，给玻璃面板提供背景层次
+    background: transparent;
   }
   .h-layout.h-layout-header-fixed {
     padding-top: 50px;
@@ -338,8 +339,11 @@ export default {
     height: 50px;
   }
   .sider-wrapper {
-    background: linear-gradient(180deg, #2F54EB 0%, #1D39C4 100%) !important;
-    box-shadow: 2px 0 12px rgba(47, 84, 235, 0.15);
+    // 玻璃拟态：半透明深绿 + 背景模糊
+    background: linear-gradient(180deg, rgba(23, 112, 74, 0.88) 0%, rgba(10, 61, 40, 0.92) 100%) !important;
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 2px 0 12px rgba(21, 122, 78, 0.18);
     display: flex;
     flex-direction: column;
     overflow: visible !important;

@@ -102,6 +102,8 @@ export default {
       this.$emit('input', value);
     },
     init() {
+      // 组件在 nextTick 前被销毁时 $refs 已清空，跳过初始化避免报错
+      if (this._isDestroyed || !this.$refs.uploader) return;
       initUploader({
         headers: { Authorization: 'Bearer ' + this.$store.state['user'].access_token },
         uptoken_url: db.getUrl('upload'),

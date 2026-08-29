@@ -359,10 +359,10 @@ export default {
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: linear-gradient(135deg, #2F54EB 0%, #1D39C4 100%);
+  background: linear-gradient(135deg, #21AB6E 0%, #157A4E 100%);
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(47, 84, 235, 0.4);
+  box-shadow: 0 4px 12px rgba(33, 171, 110, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -371,7 +371,7 @@ export default {
 }
 .asst-fab:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(47, 84, 235, 0.5);
+  box-shadow: 0 6px 20px rgba(33, 171, 110, 0.5);
 }
 .asst-fab:active {
   transform: scale(0.95);
@@ -392,7 +392,7 @@ export default {
   align-items: center;
   padding: 10px 14px;
   border-bottom: 1px solid #F0F0F0;
-  background: linear-gradient(135deg, #2F54EB 0%, #1D39C4 100%);
+  background: linear-gradient(135deg, #21AB6E 0%, #157A4E 100%);
   color: #fff;
   cursor: move;
   user-select: none;
@@ -435,11 +435,11 @@ export default {
   user-select: none;
 }
 .asst-agent:hover {
-  background: #E6F4FF;
-  color: #2F54EB;
+  background: #E9F8F0;
+  color: #21AB6E;
 }
 .asst-agent.active {
-  background: linear-gradient(135deg, #2F54EB 0%, #1D39C4 100%);
+  background: linear-gradient(135deg, #21AB6E 0%, #157A4E 100%);
   color: #fff;
 }
 .asst-agent-icon {

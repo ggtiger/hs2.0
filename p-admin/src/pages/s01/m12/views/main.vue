@@ -23,6 +23,11 @@
           v-per="'RS_M12/A08'"
         >迁移</button>
         <button
+          class="h-btn h-btn-s h-btn-yellow"
+          @click.stop="copyTemplate(data)"
+          v-per="'RS_M12/A03'"
+        >复制</button>
+        <button
           v-if="(data.ISUSE+'')!=='1'"
           class="h-btn h-btn-s h-btn-blue"
           @click.stop="endisable(data)"
@@ -134,6 +139,28 @@ export default {
         }).catch(function(e) {
           self.$free();
           self.$error('迁移失败: ' + (e.message || '网络错误'));
+        });
+      }).catch(function() {});
+    },
+    copyTemplate(row) {
+      var self = this;
+      self.$confirm('将复制模版「' + row.TEMPLATENAME + '」及其模版文件，生成一条独立的副本记录。\n\n确定要复制吗？').then(function() {
+        var apiUrl = db.getUrl('url');
+        var token = self.$store.state['user'].access_token;
+        self.$busy();
+        httpPost(apiUrl + '/api/word-template/copy/' + row.ID, {}, token).then(function(result) {
+          self.$free();
+          if (result.success) {
+            self.$callAction({
+              action: Constants.STORE_NAME + '/query',
+              successText: '复制成功',
+            });
+          } else {
+            self.$error(result.Message || '复制失败');
+          }
+        }).catch(function(e) {
+          self.$free();
+          self.$error('复制失败: ' + (e.message || '网络错误'));
         });
       }).catch(function() {});
     },

@@ -209,7 +209,7 @@ export default {
         series: [],
       },
       options2: {
-        color: ['#2F54EB', '#597EF7'],
+        color: ['#21AB6E', '#4FCB8F'],
         tooltip: {
           trigger: 'axis',
           backgroundColor: '#fff',
@@ -258,7 +258,7 @@ export default {
         ]
       },
       options3: {
-        color: ['#2F54EB', '#36CFC9', '#597EF7', '#73D13D', '#FFC53D', '#FF7A45', '#722ED1', '#F5222D'],
+        color: ['#21AB6E', '#1E6FE8', '#4FCB8F', '#36CFC9', '#FFC53D', '#FF7A45', '#722ED1', '#F5222D'],
         tooltip: {
           trigger: 'item',
           formatter: '{b}: {c} ({d}%)',
@@ -430,7 +430,7 @@ export default {
             pieData = pieData.slice(0, 10).concat([{ name: '其他', value: restValue }]);
           }
           // 最多的一项用主题色
-          let colors = ['#2F54EB', '#597EF7', '#36CFC9', '#73D13D', '#FFC53D', '#FF7A45', '#722ED1', '#F5222D', '#13C2C2', '#EB2F96', '#A0A0A0'];
+          let colors = ['#21AB6E', '#4FCB8F', '#1E6FE8', '#36CFC9', '#FFC53D', '#FF7A45', '#722ED1', '#F5222D', '#13C2C2', '#EB2F96', '#A0A0A0'];
           pieData.forEach((item, i) => {
             item.itemStyle = { color: colors[i % colors.length] };
           });
@@ -527,9 +527,9 @@ export default {
   min-height: 100%;
 }
 
-// Hero 渐变卡片（参考设计图的蓝色大数字卡片）
+// Hero 渐变卡片（logo 翡翠绿大数字卡片）
 .hero-card {
-  background: linear-gradient(135deg, #667eea 0%, #2F54EB 50%, #1D39C4 100%);
+  background: linear-gradient(135deg, #4FCB8F 0%, #21AB6E 50%, #157A4E 100%);
   border-radius: @card-border-radius;
   padding: 24px;
   color: #fff;
@@ -537,7 +537,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 4px 16px rgba(47, 84, 235, 0.25);
+  box-shadow: 0 4px 16px rgba(33, 171, 110, 0.25);
 }
 .hero-card-label {
   font-size: 13px;
