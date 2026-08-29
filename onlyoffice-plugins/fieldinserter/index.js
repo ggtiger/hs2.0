@@ -3,8 +3,12 @@
   var SELECTION_CHECK_INTERVAL = 600;
   var INSERT_GAP = 400;
   var INSERT_TIMEOUT = 3000;
-  var API_URL = window._WORD_TEMPLATE_API_URL_ || 'http://localhost:5001/api/word-template/field-queue';
-  var SEL_URL = window._WORD_TEMPLATE_SEL_URL_ || 'http://localhost:5001/api/word-template/current-selection';
+  // API 地址：优先取动态注入值（plugin/code 模式）；
+  // 否则按插件 iframe 的当前主机推导。
+  // 端口说明：外网代理场景 webapi 为 6001；若内网直连部署请改回 5001
+  var _HOST = window.location.protocol + '//' + window.location.hostname + ':6001';
+  var API_URL = window._WORD_TEMPLATE_API_URL_ || (_HOST + '/api/word-template/field-queue');
+  var SEL_URL = window._WORD_TEMPLATE_SEL_URL_ || (_HOST + '/api/word-template/current-selection');
   var docKey = window._WORD_TEMPLATE_DOC_KEY_ || '';
   var pollTimer = null;
   var selectionTimer = null;

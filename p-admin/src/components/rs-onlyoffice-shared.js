@@ -2,8 +2,15 @@
  * OnlyOffice 公共模块
  * 提供脚本加载、HTTP 工具函数，供 rs-onlyoffice-preview、word-template-editor、excel-editor 共享
  */
-// OnlyOffice Document Server 地址：优先使用环境变量，回退到 localhost
-var ONLYOFFICE_URL = process.env.ONLYOFFICE_DOC_SERVER || 'http://localhost:8088';
+// OnlyOffice Document Server 地址：
+// 优先使用构建时环境变量；否则动态推导：浏览器当前主机 + (前端端口 + 8)
+//   外网代理: 6080 -> 6088；内网直连: 8080 -> 8088
+// 无端口(默认80)时回退 6088（外网代理场景）
+var ONLYOFFICE_URL = process.env.ONLYOFFICE_DOC_SERVER ||
+  (typeof window !== 'undefined' && window.location
+    ? window.location.protocol + '//' + window.location.hostname + ':'
+        + (window.location.port ? (Number(window.location.port) + 8) : '6088')
+    : 'http://localhost:8088');
 
 // OnlyOffice API 脚本加载状态（全局单例，确保只加载一次）
 var scriptLoaded = false;

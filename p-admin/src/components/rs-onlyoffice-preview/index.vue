@@ -76,9 +76,10 @@ export default {
           throw new Error('OnlyOffice API 不可用');
         }
 
-        // 构建文件下载 URL，Document Server 需要能访问此 URL
-        var uploadUrl = db.getUrl('upload');
-        var fileUrl = uploadUrl.replace('127.0.0.1', 'host.docker.internal').replace('localhost', 'host.docker.internal') + self.fileId;
+        // 构建文件下载 URL（绝对地址）：浏览器和 OnlyOffice 文档服务器都要能访问
+        // 外网代理模式 webapi 为 6001；内网直连部署请改回 5001
+        var apiHost = window.location.protocol + '//' + window.location.hostname + ':6001';
+        var fileUrl = apiHost + '/api/file/' + self.fileId;
         var docKey = self.fileId + '_' + Date.now();
         var docTitle = self.title || ('\u6587\u6863.' + self.fileType);
 

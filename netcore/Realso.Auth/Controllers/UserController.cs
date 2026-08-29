@@ -92,6 +92,7 @@ namespace Realso.Auth.Controllers
       qview.SetValue("PASSWORD", "");
       string USERID = qview.GetValue("ID");
       var client = new HttpClient();
+      // 容器内 auth 服务即 localhost:5000；签发者一致性由 Startup 中 IssuerUri 保证
       var disco = await client.GetDiscoveryDocumentAsync("http://localhost:5000");
       var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
       {

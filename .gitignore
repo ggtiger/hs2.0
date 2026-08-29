@@ -23,3 +23,7 @@ Log/
 .env
 .env.local
 .env.*.local
+
+# 部署产物
+realso-images*.tar.gz
+

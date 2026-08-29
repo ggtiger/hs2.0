@@ -31,7 +31,7 @@
 
 <script>
 import homeHeader from './views/home-header';
-import homeBody from './views/home-Body';
+import homeBody from './views/home-body';
 export default {
   components: {
     homeHeader,
