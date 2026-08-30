@@ -39,6 +39,7 @@
             :canUpload="!ID||PTEMPLATEID"
             v-show="PTEMPLATEID"
             @remove="removeFile"
+            @input="onFilesInput"
           >
             <rs-edit-item
               ref="edit"
@@ -659,6 +660,10 @@ export default {
       var list = [...this.FILES];
       list.splice(index, 1);
       this.FILES = list;
+    },
+    // 附件上传完成：写入 FILES（SETFILEDATA 更新 DTSD），否则列表不刷新
+    onFilesInput(files) {
+      this.FILES = files || [];
     },
     checkWideLayout() {
       // 宽屏判断：窗口宽度足够容纳表单(900px) + 审批面板(280px) + 间距

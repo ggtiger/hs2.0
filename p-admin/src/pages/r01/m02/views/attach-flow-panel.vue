@@ -9,7 +9,8 @@
           :readonly="readonly"
           type="files"
           data-type="file"
-          v-model="files"
+          :value="files"
+          @input="$emit('input', $event)"
           class="rr-hide-default-uploader"
         ></RsUploader>
         <div class="rr-afp-grid">
@@ -69,7 +70,8 @@
             :readonly="readonly"
             type="files"
             data-type="file"
-            v-model="files"
+            :value="files"
+            @input="$emit('input', $event)"
           ></RsUploader>
         </div>
         <div class="rr-afp-narrow-flow" v-if="logs.length > 0">

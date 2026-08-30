@@ -164,10 +164,10 @@ function getStore() {
             },
           });
         },
-        // 异常检测（LI_M02/A57；返回 { Code, Data: anomalies[] }）
+        // 异常检测（LI_M02/A57 自定义接口, 走 RM11Controller；返回 { Code, Data: anomalies[] }）
         async detectAnomalies(ctx, { id }) {
           return db.postData({
-            api: '/api/data/call/LI_M02/A57/',
+            api: '/api/RM11/call/LI_M02/A57/',
             params: { FilterParams: { ID: id } },
           });
         },
