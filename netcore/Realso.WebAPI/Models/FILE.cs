@@ -25,7 +25,14 @@ namespace Realso.WebAPI.Models
       if (this.GetView().Count == 1)
       {
         // 兼容历史 Windows 生成的含 \ 路径：统一为正斜杠(.NET IO 双平台兼容)
-        return rootPath + (this.GetValue("FILEPATH") + "").Replace('\\', '/');
+        string rawPath = rootPath + (this.GetValue("FILEPATH") + "");
+        string convertedPath = rawPath.Replace('\\', '/');
+        // 本服务器历史文件以字面反斜杠为目录名存储，转换路径不存在时回退原始路径
+        if (!System.IO.File.Exists(convertedPath) && System.IO.File.Exists(rawPath))
+        {
+          return rawPath;
+        }
+        return convertedPath;
       }
       else
       {
