@@ -249,6 +249,11 @@ namespace Realso.WebAPI.Controllers
         {
           list[dtsaResourceName] = tlist;
         }
+        // 兼容编辑器新标记（Tag=DTSA_TABLE，baseName=DTSA）：再放一份 PATHNAME 键
+        if (!list.ContainsKey("DTSA"))
+        {
+          list["DTSA"] = tlist;
+        }
 
         string CERTEMPID = MAIN.GetValue("CERTEMPID");
         FILE file = new FILE(this.operate01);
@@ -717,6 +722,11 @@ namespace Realso.WebAPI.Controllers
       if (!string.IsNullOrEmpty(dtsaResourceName) && !list.ContainsKey(dtsaResourceName))
       {
         list[dtsaResourceName] = tlist;
+      }
+      // 兼容编辑器新标记（Tag=DTSA_TABLE，baseName=DTSA）：再放一份 PATHNAME 键
+      if (!list.ContainsKey("DTSA"))
+      {
+        list["DTSA"] = tlist;
       }
 
       string CERTEMPID = MAIN.GetValue("CERTEMPID");

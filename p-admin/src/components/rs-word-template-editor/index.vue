@@ -391,8 +391,9 @@ export default {
 
       httpGet(apiUrl + '/api/word-template/field-config?fileId=' + self.fileId, token)
         .then(function(result) {
-          if (result.moduleCode) self.selectedModule = result.moduleCode;
-          if (result.templateId) self.selectedTemplate = result.templateId;
+          // 已保存的配置优先；无配置时用 props(moduleCode/templateId)作初始值，与字段列表保持一致
+          self.selectedModule = result.moduleCode || self.moduleCode || '';
+          self.selectedTemplate = result.templateId || self.templateId || '';
           if (result.manualFields && Array.isArray(result.manualFields)) {
             self.manualFields = result.manualFields;
           }
@@ -486,11 +487,13 @@ export default {
       var token = self.$store.state['user'].access_token;
 
       var params = [];
-      if (self.moduleCode || self.selectedModule) {
-        params.push('moduleCode=' + (self.moduleCode || self.selectedModule));
+      // 用户当前选择优先，props(moduleCode/templateId)仅作为初始兜底
+      // 否则保存配置后再打开、改选下拉时字段列表会被 prop 锁死不变
+      if (self.selectedModule || self.moduleCode) {
+        params.push('moduleCode=' + (self.selectedModule || self.moduleCode));
       }
-      if (self.templateId || self.selectedTemplate) {
-        params.push('templateId=' + (self.templateId || self.selectedTemplate));
+      if (self.selectedTemplate || self.templateId) {
+        params.push('templateId=' + (self.selectedTemplate || self.templateId));
       }
       if (self.businessType) {
         params.push('type=' + self.businessType);

@@ -27,3 +27,6 @@ Log/
 # 部署产物
 realso-images*.tar.gz
 
+
+# Auth 签名密钥（私钥，本地/生产各自独立生成，不入仓库）
+netcore/Realso.Auth/signing-key.json

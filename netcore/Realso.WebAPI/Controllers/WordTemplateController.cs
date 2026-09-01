@@ -1754,13 +1754,11 @@ window._WORD_TEMPLATE_DOC_KEY_ = " + docKeyJs + @";
       }
     }
 
-    // 系统字段（不在模版中暴露）
+    // 系统字段（不在模版中暴露）：只排除纯技术字段（主键/外键/附件/逻辑删除）
+    // 制单人/审核人/时间/状态等审计字段放开——证书/报告模版中制单人、签章日期、状态很常用
     private static readonly HashSet<string> _systemFieldNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
       "ID", "REFID", "REFBILLID", "REFBILLCODE", "ORECORDID", "REFRESID",
-      "CREATEID", "CREATER", "CREATETIME", "SUBMITID", "SUBMITER", "SUMBMITTIME",
-      "MODIFYID", "MODIFER", "MODIFYTIME", "CHECKID", "CHECKER", "CHECKTIME",
-      "VERIFYID", "VERIFIER", "VERIFYTIME", "STATE", "REMARK", "SORT", "ENTRYNUM",
       "DOCCODE", "FILEID", "FILENAME", "FILESIZE", "FILEPATH", "ISDELETED"
     };
 

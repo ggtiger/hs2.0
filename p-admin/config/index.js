@@ -10,7 +10,25 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    // 本地联调代理：urls.js 使用同源相对路径，由 dev server 转发到后端
+    // /auth/ -> Realso.Auth:5000（登录/登出），/api/ /hub/ -> Realso.WebAPI:5001
+    proxyTable: {
+      '/auth': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+        // Auth 服务路由是 /api/user/login，转发时去掉 /auth 前缀
+        pathRewrite: { '^/auth': '' }
+      },
+      '/api': {
+        target: 'http://127.0.0.1:5001',
+        changeOrigin: true
+      },
+      '/hub': {
+        target: 'http://127.0.0.1:5001',
+        ws: true,
+        changeOrigin: true
+      }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
