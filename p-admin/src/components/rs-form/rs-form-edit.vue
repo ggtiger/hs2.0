@@ -841,8 +841,11 @@ const edit = {
         }
       });
     }
+    // 系统审计字段由后端自动填充(无需用户填写)，不参与必填校验
+    // 否则这些只读展示字段永远为空, valid() 静默失败, 保存无任何反应
+    const AUDIT_FIELDS = ['CREATEID', 'CREATER', 'CREATETIME', 'MODIFYID', 'MODIFER', 'MODIFYTIME'];
     this.rules = {
-      required: fields.filter(i => i.props.nullable !== 1 && i.props.type !== 'toolbar').map(item => item.props.key),
+      required: fields.filter(i => i.props.nullable !== 1 && i.props.type !== 'toolbar' && AUDIT_FIELDS.indexOf(i.props.key) === -1).map(item => item.props.key),
     };
     this.innerFields = fields;
     this._applyDisabled();

@@ -128,7 +128,7 @@ namespace Realso.WebAPI.Controllers
         ViewRow row = MAIN.GetView()[0];
         string FILENAME = row.GetString("FILENAME");
         string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
-        string FilePath = rootPath + row.GetString("FILEPATH");
+        string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
 
         if (!System.IO.File.Exists(FilePath))
         {
@@ -400,7 +400,7 @@ namespace Realso.WebAPI.Controllers
           {
             ViewRow row = MAIN.GetView()[0];
             string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
-            string originalPath = rootPath + row.GetString("FILEPATH");
+            string originalPath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
             System.IO.File.Copy(info.FilePath, originalPath, true);
             Logger.Info("WordTemplate Save: 已覆盖原始文件 " + originalPath);
           }
@@ -1605,7 +1605,7 @@ window._WORD_TEMPLATE_DOC_KEY_ = " + docKeyJs + @";
 
         ViewRow row = MAIN.GetView()[0];
         string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
-        string FilePath = rootPath + row.GetString("FILEPATH");
+        string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
 
         if (!System.IO.File.Exists(FilePath))
         {
@@ -2372,7 +2372,7 @@ window._WORD_TEMPLATE_DOC_KEY_ = " + docKeyJs + @";
         ViewRow row = MAIN.GetView()[0];
         string FILENAME = row.GetString("FILENAME");
         string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
-        string FilePath = rootPath + row.GetString("FILEPATH");
+        string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
 
         if (!System.IO.File.Exists(FilePath))
         {
@@ -2711,7 +2711,9 @@ window._WORD_TEMPLATE_DOC_KEY_ = " + docKeyJs + @";
             return Ok(new { success = false, Message = "模版文件记录不存在" });
           }
           string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
-          string srcPath = rootPath + (srcFile.FILEPATH + "");
+          // 兼容历史 Windows 生成的含 \ 路径
+          string srcRelPath = (srcFile.FILEPATH + "").Replace('\\', '/');
+          string srcPath = rootPath + srcRelPath;
           if (!System.IO.File.Exists(srcPath))
           {
             return Ok(new { success = false, Message = "模版文件不存在于磁盘" });
@@ -2728,7 +2730,7 @@ window._WORD_TEMPLATE_DOC_KEY_ = " + docKeyJs + @";
 
           // 4. 写入 tss_files 文件记录
           string newFileId = Guid.NewGuid().ToString("N");
-          string copyRelativePath = (srcFile.FILEPATH + "").Replace(Path.GetFileName(srcFile.FILEPATH + ""), copyFileName);
+          string copyRelativePath = srcRelPath.Replace(Path.GetFileName(srcRelPath), copyFileName);
           helper.Execute(
             "INSERT INTO tss_files (ID, FILENAME, FILEPATH, FILESIZE, CREATEDATE) VALUES (@ID, @NAME, @PATH, @SIZE, NOW())",
             new { ID = newFileId, NAME = copyFileName, PATH = copyRelativePath, SIZE = new System.IO.FileInfo(copyPath).Length });

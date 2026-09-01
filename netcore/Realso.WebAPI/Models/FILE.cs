@@ -24,7 +24,8 @@ namespace Realso.WebAPI.Models
       this.OpenByID(ID);
       if (this.GetView().Count == 1)
       {
-        return rootPath + this.GetValue("FILEPATH") + "";
+        // 兼容历史 Windows 生成的含 \ 路径：统一为正斜杠(.NET IO 双平台兼容)
+        return rootPath + (this.GetValue("FILEPATH") + "").Replace('\\', '/');
       }
       else
       {
@@ -63,17 +64,19 @@ namespace Realso.WebAPI.Models
       view.AddRow(row);
       this.FillKey();
       String FilePath = rPath;
+      // 目录分隔统一用 /：Windows/Linux 的 .NET IO 均兼容正斜杠，
+      // 避免 Linux 下 "其他\2026-08\" 被当成单个目录名
       if (createType == "YEAR")
       {
-        FilePath += "\\" + DateTime.Now.ToString("yyyy") + "\\";
+        FilePath += "/" + DateTime.Now.ToString("yyyy") + "/";
       }
       else if (createType == "MONTH")
       {
-        FilePath += "\\" + DateTime.Now.ToString("yyyy-MM") + "\\";
+        FilePath += "/" + DateTime.Now.ToString("yyyy-MM") + "/";
       }
       else if (createType == "DAY")
       {
-        FilePath += "\\" + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
+        FilePath += "/" + DateTime.Now.ToString("yyyy-MM-dd") + "/";
       }
       string FileName = Path.GetFileNameWithoutExtension(FILENAME) + "-" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + Path.GetExtension(FILENAME);
       DirectoryInfo di = new DirectoryInfo(rootPath + FilePath);
@@ -174,17 +177,18 @@ namespace Realso.WebAPI.Models
       view.AddRow(row);
       this.FillKey();
       String FilePath = rPath;
+      // 目录分隔统一用 /（同 Save 方法，跨平台兼容）
       if (createType == "YEAR")
       {
-        FilePath += "\\" + DateTime.Now.ToString("yyyy") + "\\";
+        FilePath += "/" + DateTime.Now.ToString("yyyy") + "/";
       }
       else if (createType == "MONTH")
       {
-        FilePath += "\\" + DateTime.Now.ToString("yyyy-MM") + "\\";
+        FilePath += "/" + DateTime.Now.ToString("yyyy-MM") + "/";
       }
       else if (createType == "DAY")
       {
-        FilePath += "\\" + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
+        FilePath += "/" + DateTime.Now.ToString("yyyy-MM-dd") + "/";
       }
       string FileName = Path.GetFileNameWithoutExtension(FILENAME) + "-" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + Path.GetExtension(FILENAME);
       DirectoryInfo di = new DirectoryInfo(rootPath + FilePath);

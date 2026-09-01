@@ -117,7 +117,7 @@ namespace Realso.WebAPI.Controllers
 
         string fileExt = Path.GetExtension(FILENAME);
         string rootPath = Realso.Utils.ConfigHelper.GetConfig($"Upload:ROOT");
-        string FilePath = rootPath + row.GetString("FILEPATH");
+        string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
         if(row.GetString("FILEPATH").IndexOf("http")==0){
           return Redirect(row.GetString("FILEPATH"));
         }
@@ -161,7 +161,7 @@ namespace Realso.WebAPI.Controllers
         ViewRow row = MAIN.GetView()[0];
         string FILENAME = row.GetString("FILENAME");
         string rootPath = Realso.Utils.ConfigHelper.GetConfig($"Upload:ROOT");
-        string FilePath = rootPath + row.GetString("FILEPATH");
+        string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
         string pdfPath = FilePath.Replace(".docx", ".pdf");
 
         // 优先使用已缓存的PDF
@@ -230,7 +230,7 @@ namespace Realso.WebAPI.Controllers
 
         string fileExt = Path.GetExtension(FILENAME);
         string rootPath = Realso.Utils.ConfigHelper.GetConfig($"Upload:ROOT");
-        string FilePath = rootPath + row.GetString("FILEPATH");
+        string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
         Logger.Info(FilePath);
         if(!System.IO.File.Exists(FilePath.Replace(".docx", ".pdf"))){
             OnlyOfficeConverter.ConvertToPdf(FilePath, FilePath.Replace(".docx", ".pdf"), Id);
@@ -279,7 +279,7 @@ namespace Realso.WebAPI.Controllers
         ViewRow row = MAIN.GetView()[0];
         string FILENAME = row.GetString("FILENAME");
         string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
-        string FilePath = rootPath + row.GetString("FILEPATH");
+        string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
 
         if (!System.IO.File.Exists(FilePath))
         {
