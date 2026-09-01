@@ -128,7 +128,13 @@ namespace Realso.WebAPI.Controllers
         ViewRow row = MAIN.GetView()[0];
         string FILENAME = row.GetString("FILENAME");
         string rootPath = Realso.Utils.ConfigHelper.GetConfig("Upload:ROOT");
+        // 兼容两种路径形态：Windows 分隔符数据（\ 转 /）与 Linux 下以字面反斜杠为目录名的历史文件
+        string rawPath = rootPath + row.GetString("FILEPATH");
         string FilePath = rootPath + row.GetString("FILEPATH").Replace('\\', '/');
+        if (!System.IO.File.Exists(FilePath) && System.IO.File.Exists(rawPath))
+        {
+          FilePath = rawPath;
+        }
 
         if (!System.IO.File.Exists(FilePath))
         {
